@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/Hesowam/ClosenessBot#readme",
   "dependencies": {
-    "discord.js": "^12.1.1"
+    "discord.js": "^12.1.1",
+    "ffmpeg-static": "^4.1.1",
+    "opusscript": "0.0.7"
   }
 }

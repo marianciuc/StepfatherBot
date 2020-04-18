@@ -1,2 +1,3 @@
 # ClosenessBot
-Discord bot for creating private rooms
+**Discord** bot for creating private rooms
+
