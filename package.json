@@ -4,7 +4,8 @@
   "description": "Discord bot for creating private rooms",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "node .": "node main.js"
   },
   "repository": {
     "type": "git",
@@ -17,8 +18,9 @@
   },
   "homepage": "https://github.com/Hesowam/ClosenessBot#readme",
   "dependencies": {
-    "discord.js": "^12.1.1",
+    "discord.js": "^12.2.0",
     "ffmpeg-static": "^4.1.1",
+    "node.date-time": "^1.2.2",
     "opusscript": "0.0.7"
   }
 }
