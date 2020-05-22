@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+var mysql = require("mysql");
 const bot = new Discord.Client();
 var fs = require("fs");
 const format = require("node.date-time");

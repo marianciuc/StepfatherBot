@@ -1,5 +1,8 @@
 {
     "token":"NzAwMTEzNjEzODI1NzY5NTIy.XpeSgg.NzzZ4IxE5wYi0BIjslLohcfKymQ",
     "prefix":"!",
-    "adminPref":4
+    "adminPref":4,
+    "DATABASE_USERNAME": "root",
+    "DATABASE_PASSWORD": "1111",
+    "DATABASE_URL": "localhost"
 }
