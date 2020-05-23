@@ -3,16 +3,22 @@ var mysql = require("mysql");
 const bot = new Discord.Client();
 var fs = require("fs");
 const format = require("node.date-time");
-const { prefix, token,adminPref } = require("./config.json");
+const { prefix, token ,DATABASE_PASSWORD, DATABASE_URL, DATABASE_USERNAME, DATABASE_NAME } = require("./config.json");
 const package = require("./package.json");
 bot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-var date = new Date();
+
+let date = new Date();
 for (let file of commandFiles) {
 	let command = require(`./commands/${file}`);
 	bot.commands.set(command.name, command);
 }
-
+var connection = mysql.createConnection({
+  host: DATABASE_URL,
+  user: DATABASE_USERNAME,
+  password: DATABASE_PASSWORD,
+  database: DATABASE_NAME
+});
 bot.login(token);
 bot.once("ready", () => {
   log("readme", "["+date.format("Y-M-d H:m:s")+"]"+` ${bot.user.username} has started\n`, true);
@@ -20,7 +26,7 @@ bot.once("ready", () => {
     console.log(link);
   });
   console.log("Bot author: "+ package.author+"\nVersion: "+package.version);
-  bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
+  bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
 });
 
 bot.on("message", async (message) => {
@@ -62,3 +68,4 @@ bot.on("guildDelete", guild => {
   log(GuildAdd&Remove, `I have been removed from: ${guild.name}[id_${guild.id}].`, true);
   bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
 });
+var removeGuild = () => {};

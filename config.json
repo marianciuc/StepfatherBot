@@ -4,5 +4,6 @@
     "adminPref":4,
     "DATABASE_USERNAME": "root",
     "DATABASE_PASSWORD": "1111",
-    "DATABASE_URL": "localhost"
+    "DATABASE_URL": "localhost",
+    "DATABASE_NAME": "discord"
 }
