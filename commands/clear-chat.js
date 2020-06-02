@@ -1,5 +1,5 @@
 module.exports = {
-  name: "clearChat",
+  name: "clear-chat",
   descriptiom: "Clearing chat",
   execute(msg) {
     let amount = parseInt(msg.content.replace(/\D+/g, ""));
