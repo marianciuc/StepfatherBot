@@ -18,10 +18,14 @@
   },
   "homepage": "https://github.com/Hesowam/ClosenessBot#readme",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.2.0",
     "ffmpeg-static": "^4.1.1",
+    "moment": "^2.26.0",
     "mysql": "^2.18.1",
     "node.date-time": "^1.2.2",
-    "opusscript": "0.0.7"
+    "opusscript": "0.0.7",
+    "readline": "^1.3.0",
+    "request": "^2.88.2"
   }
 }
