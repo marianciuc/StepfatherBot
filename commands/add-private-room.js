@@ -4,7 +4,7 @@ module.exports = {
   name: "add-private-room",
   description: "private add <category id> <channel id>",
   async execute(args, message) {
-    if (args.length < 3 || !message.author.hasPermission("ADMINISTRATOR")) return;
+    if (args.length < 3) return;
     let guildId = message.guild.id;
     if (!serverJson[guildId]) {
       serverJson[guildId] = {
