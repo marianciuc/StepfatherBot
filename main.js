@@ -48,8 +48,17 @@ bot.on("message", async (message) => {
         case "purge":
             bot.commands.get('clear-chat').execute(message);
             return 0;
+        case "avatar":
+            bot.commands.get('get-user-image').execute(message);
+            return 0;
         case "rand":
             bot.commands.get('random').execute(message.content, message);
+            return 0;
+        case "flip":
+            bot.commands.get('coin-flip').execute(message, bot);
+            return 0;
+        case "connect":
+            bot.commands.get('private-help').execute(message);
             return 0;
         case "private":
             switch (args[0]) {
@@ -69,29 +78,29 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
             if (servers[guildId].channelId == newState.channel.id) {
                 newState.channel.clone({
                     name: newState.member.user.username + " 🔓",
-                    reason: 'Closeness function activated',
+                    reason: 'Closeness function activated.',
                     userLimit: servers[newState.channel.guild.id].limit
                 }).then(clone => {
-                    newState.setChannel(clone, "Closeness function activated");
+                    newState.setChannel(clone, "Closeness function activated.");
                     interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
-                            clone.delete("ss").catch(console.error());
+                            clone.delete("All users leave.").catch(err => console.error(err.message));
                             clearInterval(interval);
                             return;
                         }
                         if (!clone.full) {
-                            clone.setName(newState.member.user.username + " 🔓")
+                            clone.setName(newState.member.user.username + " 🔓").catch(err => console.error(err.message));
+                        } else if (clone.full) {
+                            clone.setName(newState.member.user.username + " 🔐").catch(err => console.error(err.message));
                         }
-                        else if (clone.full) {
-                            clone.setName(newState.member.user.username + " 🔐")
-                        }
-                    }, 1000);
+                    }, 5000);
                 })
                 return;
             }
         }
     }
 });
+
 function log(LogNameFile, loggedMessage, boolean) {
     fs.appendFileSync('./logger/' + LogNameFile + '.log', loggedMessage);
     if (boolean) {
@@ -99,7 +108,6 @@ function log(LogNameFile, loggedMessage, boolean) {
     }
     ;
 }
-
 bot.on("guildCreate", guild => {
     log(GuildAdd & Remove, `New guild joined: ${guild.name}[id_${guild.id}]. This guild has ${guild.memberCount} members`, true);
     bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
