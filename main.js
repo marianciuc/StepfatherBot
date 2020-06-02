@@ -2,6 +2,15 @@ const Discord = require("discord.js");
 var mysql = require("mysql");
 const bot = new Discord.Client();
 var fs = require("fs");
+var express = require('express');
+var app     = express();
+app.set('port', (process.env.PORT || 5000));
+app.get('/', function(request, response) {
+    var result = 'App is running'
+    response.send(result);
+}).listen(app.get('port'), function() {
+    console.log('App is running, server is listening on port ', app.get('port'));
+});
 const format = require("node.date-time");
 const {prefix, token, DATABASE_PASSWORD, DATABASE_URL, DATABASE_USERNAME, DATABASE_NAME} = require("./config.json");
 const package = require("./package.json");
@@ -12,7 +21,7 @@ let date = new Date();
 !function () {
     for (let file of commandFiles) {
         try {
-            
+
             let command = require(`./commands/${file}`);
             bot.commands.set(command.name, command);
             console.log(`Added ${command.name}.`)
