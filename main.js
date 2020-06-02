@@ -12,6 +12,7 @@ let date = new Date();
 !function () {
     for (let file of commandFiles) {
         try {
+            
             let command = require(`./commands/${file}`);
             bot.commands.set(command.name, command);
             console.log(`Added ${command.name}.`)
