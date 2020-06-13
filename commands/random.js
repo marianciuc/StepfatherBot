@@ -1,6 +1,6 @@
 module.exports = {
     name: "random",
-    descriptiom: "Generating random value",
+    description: "Generating random value",
     execute(maxValue, msg){
         maxValue = parseInt(maxValue.replace(/\D+/g, ""));
         maxValue < 32767 && maxValue > 0
@@ -10,6 +10,6 @@ module.exports = {
           " - " +
           Math.floor(Math.random() * maxValue)
       )
-    : msg.channel.send("Error. Enter another value.");
+    : msg.channel.send("Error 🚑. Enter another value.");
     }
 }

@@ -13,7 +13,7 @@ const date = new Date();
 //Activate app
 app.set('port', (process.env.PORT || 5000));
 app.get('/', function(request, response) {
-    var result = 'App is running'
+    let result = 'App is running'
     response.send(result);
 }).listen(app.get('port'), function() {
     console.log('App is running, server is listening on port ', app.get('port'));
@@ -36,7 +36,7 @@ bot.commands = new Discord.Collection();
 }();
 
 //Bot login
-bot.login(token);
+bot.login(token).then(r => console.log("Login successful"));
 
 bot.once("ready", () => {
     log("readme", "[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started\n`, true);
@@ -45,14 +45,25 @@ bot.once("ready", () => {
     });
     console.log("Bot author: " + package.author + "\nVersion: " + package.version);
     bot.user.setActivity(` ${bot.guilds.cache.size} servers`, {type: "LISTENING"});
+
+
+    for (let channel of bot.channels.cache){
+        channel.map(channel => {
+            if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId){
+                channel.delete("All users leave.").catch(err => console.error(err.message));
+            }
+        });
+    }
+
 });
 
 //message listener
 bot.on("message", async (message) => {
-    log("readme", "Chat log " + "[" + date.format("Y-M-d H:m:S") + "]" + "[" + message.guild.name + "]" + " [" + message.author.username + "]: " + message.content + "\n", true);
+    //checking for commands
     if (!message.guild && message.author.bot && !message.content.startsWith(prefix)) return;
     const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);
     const command = args.shift();
+
     switch (command) {
         case "help":
             bot.commands.get('help-menu').execute(message);
@@ -95,8 +106,8 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
                     reason: 'Closeness function activated.',
                     userLimit: servers[newState.channel.guild.id].limit
                 }).then(clone => {
-                    newState.setChannel(clone, "Closeness function activated.");
-                    interval = setInterval(() => {
+                    newState.setChannel(clone, "Closeness function activated.").catch(error => {console.error(error)});
+                    let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
                             clone.delete("All users leave.").catch(err => console.error(err.message));
                             clearInterval(interval);
@@ -128,16 +139,16 @@ bot.on("guildCreate", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name} add ${bot.user.username} to server`, `https://image.flaticon.com/icons/svg/2232/2232129.svg`, `${guild.iconURL()}`)
+            .setAuthor(`${guild.name} add ${bot.user.username} to server`, `https://image.flaticon.com/icons/svg/2232/2232129.svg`, `${guild.icon}`)
             .addFields(
                 {
                     name: 'Basic',
-                    value: `Server name: ${guild.name}(${guild.id})\nServer owner: ${guild.owner.user.username}`,
-                    inline: true
+                    value: `**Server name:** ${guild.name}\n**Server id:** ${guild.id})\n**Server owner:** ${guild.owner.user.username}`,
+                    inline: false
                 }, {
                     name: 'Other',
-                    value: `Members: ${guild.memberCount}`,
-                    inline: true
+                    value: `**Members: **${guild.memberCount}`,
+                    inline: false
                 },
             );
         channel.send(embed).catch(err => console.error(err));
@@ -161,8 +172,8 @@ bot.on("guildDelete", guild => {
                     inline: true
                 }, {
                     name: 'Other',
-                    value: `Members: ${guild.memberCount}`,
-                    inline: true
+                    value: `**Members: **${guild.memberCount}`,
+                    inline: false
                 },
             );
         channel.send(embed).catch(err => console.error(err))
