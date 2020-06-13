@@ -9,6 +9,21 @@ const package = require("./package.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
+const MongoClient = require("mongodb").MongoClient;
+
+const minute = 60*60;
+const hour = minute*60;
+const day = hour * 24;
+
+const mongoClient = new MongoClient("mongodb://localhost:27017/", { useNewUrlParser: true });
+mongoClient.connect(function(err, client){
+
+    if(err){
+        return console.log(err);
+    }
+    // взаимодействие с базой данных
+    client.close();
+});
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
@@ -39,20 +54,20 @@ bot.login(token).then(r => console.log("Login successful"));
 
 bot.once("ready", () => {
     log("readme", "[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started\n`, true);
+
     bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
         console.log(link);
+    });
 
-        console.log("Bot author: " + package.author + "\nVersion: " + package.version);
-        bot.user.setActivity(` ${bot.guilds.cache.size} servers`, {type: "LISTENING"});
+    console.log("Bot author: " + package.author + "\nVersion: " + package.version);
 
-        for (let channel of bot.channels.cache) {
-            channel.map(channel => {
-                if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
-                    channel.delete("All users leave.").catch(err => console.error(err.message));
-                }
-            });
-        }
-});
+    for (let channel of bot.channels.cache) {
+        channel.map(channel => {
+            if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
+                channel.delete("All users leave.").catch(err => console.error(err.message));
+            }
+        });
+    }
 });
 
 //message listener
@@ -95,6 +110,24 @@ bot.on("message", async (message) => {
             }
     }
 });
+
+let intervalStatus = setInterval(()=> {
+    let sq = Math.floor(Math.random() * 100);
+    if (sq < 50){
+        let count = 0;
+        for (let guild of bot.guilds.cache) {
+            guild.map(guild => {
+                if (guild.memberCount){
+                    count += guild.memberCount;
+                }
+            });
+            bot.user.setActivity(`Serving ${count} members`);
+        }
+    } else if(sq > 50){
+        bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
+    }
+
+}, hour*6);
 
 //Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
