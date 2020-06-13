@@ -4,7 +4,11 @@ module.exports = {
     name: "change-limit-for-private-rooms",
     description: "private add <category id> <channel id>",
     async execute(args, message) {
-        if (args.length < 2 || !message.author.hasPermission("ADMINISTRATOR")) return;
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            message.channel.send("You are not administrator");
+            return 0;
+        }
+        if (args.length < 2) return;
         let guildId = message.guild.id;
         if (!serverJson[guildId]) {
             message.channel.send("First you need to set up a private channel");

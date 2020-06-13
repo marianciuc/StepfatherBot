@@ -8,8 +8,9 @@ module.exports = {
         `Please provide a number between 2 and 100 for the number of messages to delete`
       );
     }
-    if (msg.hasPermission("ADMINISTRATOR")) {
+    if (!msg.member.hasPermission("ADMINISTRATOR")) {
       msg.channel.send("You are not administrator");
+      return 0;
     }
     msg.channel.bulkDelete(amount, true).catch((err) => {
       console.err(err);

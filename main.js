@@ -12,10 +12,10 @@ const date = new Date();
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
-app.get('/', function(request, response) {
+app.get('/', function (request, response) {
     let result = 'App is running'
     response.send(result);
-}).listen(app.get('port'), function() {
+}).listen(app.get('port'), function () {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
 
@@ -24,7 +24,6 @@ bot.commands = new Discord.Collection();
 !function () {
     for (let file of commandFiles) {
         try {
-
             let command = require(`./commands/${file}`);
             bot.commands.set(command.name, command);
             console.log(`Added ${command.name}.`)
@@ -42,19 +41,18 @@ bot.once("ready", () => {
     log("readme", "[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started\n`, true);
     bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
         console.log(link);
-    });
-    console.log("Bot author: " + package.author + "\nVersion: " + package.version);
-    bot.user.setActivity(` ${bot.guilds.cache.size} servers`, {type: "LISTENING"});
 
+        console.log("Bot author: " + package.author + "\nVersion: " + package.version);
+        bot.user.setActivity(` ${bot.guilds.cache.size} servers`, {type: "LISTENING"});
 
-    for (let channel of bot.channels.cache){
-        channel.map(channel => {
-            if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId){
-                channel.delete("All users leave.").catch(err => console.error(err.message));
-            }
-        });
-    }
-
+        for (let channel of bot.channels.cache) {
+            channel.map(channel => {
+                if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
+                    channel.delete("All users leave.").catch(err => console.error(err.message));
+                }
+            });
+        }
+});
 });
 
 //message listener
@@ -71,6 +69,9 @@ bot.on("message", async (message) => {
         case "purge":
             bot.commands.get('clear-chat').execute(message);
             return 0;
+        case "embed":
+            bot.commands.get('embeddedMessage').execute(message);
+            return 0;
         case "avatar":
             bot.commands.get('get-user-image').execute(message);
             return 0;
@@ -78,7 +79,7 @@ bot.on("message", async (message) => {
             bot.commands.get('random').execute(message.content, message);
             return 0;
         case "flip":
-            bot.commands.get('coin-flip').execute(message, bot);
+            bot.commands.get('coin-flip').execute(message);
             return 0;
         case "connect":
             bot.commands.get('private-help').execute(message);
@@ -97,16 +98,20 @@ bot.on("message", async (message) => {
 
 //Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
-    if (!oldState.channel) {
-        let guildId = newState.channel.guild.id;
+    if (!oldState.channel) {//checking VoiceState status
+
+        let guildId = newState.channel.guild.id; //Getting guild id
+
         if (servers[guildId] || servers[guildId].channelId == newState.channel.parent.id) {
-            if (servers[guildId].channelId == newState.channel.id) {
+            if (servers[guildId].channelId == newState.channel.id) { //cloning channel
                 newState.channel.clone({
                     name: newState.member.user.username + " 🔓",
                     reason: 'Closeness function activated.',
                     userLimit: servers[newState.channel.guild.id].limit
                 }).then(clone => {
-                    newState.setChannel(clone, "Closeness function activated.").catch(error => {console.error(error)});
+                    newState.setChannel(clone, "Closeness function activated.").catch(error => {
+                        console.error(error)
+                    });
                     let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
                             clone.delete("All users leave.").catch(err => console.error(err.message));
@@ -126,25 +131,28 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
     }
 });
 
+//log function
 function log(LogNameFile, loggedMessage, boolean) {
     fs.appendFileSync('./logger/' + LogNameFile + '.log', loggedMessage);
-    if (boolean) {
-        console.log(loggedMessage)
-    }
-    ;
+    if (boolean) console.log(loggedMessage);
 }
+
+//Listener for bot add to the server
 bot.on("guildCreate", guild => {
 
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name} add ${bot.user.username} to server`, `https://image.flaticon.com/icons/svg/2232/2232129.svg`, `${guild.icon}`)
+            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`, `${guild.iconURL()}`)
+            .setTitle("Added to server.")
+            .setColor(0xffd63e)
             .addFields(
                 {
                     name: 'Basic',
-                    value: `**Server name:** ${guild.name}\n**Server id:** ${guild.id})\n**Server owner:** ${guild.owner.user.username}`,
-                    inline: false
+                    value: `Server name: ${guild.name}(${guild.id})\n`
+                        + `Server owner: ${guild.owner.user.tag}`,
+                    inline: true
                 }, {
                     name: 'Other',
                     value: `**Members: **${guild.memberCount}`,
@@ -153,7 +161,6 @@ bot.on("guildCreate", guild => {
             );
         channel.send(embed).catch(err => console.error(err));
     });
-
 });
 
 //Bot removed from the server
@@ -163,12 +170,14 @@ bot.on("guildDelete", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name} delete ${bot.user.username} from server`, "https://c7.hotpng.com/preview/417/672/896/computer-icons-computer-servers-servidor-virtual-virtual-private-server-dedicated-hosting-service-technical.jpg")
+            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`, `${guild.iconURL()}`)
+            .setTitle("Removed from server.")
+            .setColor(0xffd63e)
             .addFields(
                 {
                     name: 'Basic',
                     value: `Server name: ${guild.name}(${guild.id})\n`
-                        +`Server owner: ${guild.owner.user.username}`,
+                        + `Server owner: ${guild.owner.user.tag}`,
                     inline: true
                 }, {
                     name: 'Other',
@@ -176,9 +185,6 @@ bot.on("guildDelete", guild => {
                     inline: false
                 },
             );
-        channel.send(embed).catch(err => console.error(err))
+        channel.send(embed).catch(err => console.error(err));
     });
-
 });
-
-

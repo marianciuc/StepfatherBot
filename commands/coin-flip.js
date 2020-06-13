@@ -1,9 +1,8 @@
 const Discord = require("discord.js");
-const bot = new Discord.Client();
 module.exports = {
     name: "coin-flip",
     description: "flip",
-    execute(message, bot){
+    execute(message){
         let s;
         Math.random() * 100>50 ? s = `Heads    🟡` : s = `Tails    🟡`;
         let embed = new Discord.MessageEmbed()
