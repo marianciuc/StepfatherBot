@@ -30,5 +30,8 @@
     "request": "^2.88.2",
     "body-parser": "^1.18.0",
     "mongodb": "^3.1.0"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
