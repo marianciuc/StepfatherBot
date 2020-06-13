@@ -10,4 +10,5 @@ Some basic bot commands are:
 + ```private limit <new limit>```
 + ```flip```
 + ```rand <max value>```
-+ ![img](https://github.com/Hesowam/ClosenessBot/blob/master/resources/prew.gif)
+
+![img](https://github.com/Hesowam/ClosenessBot/blob/master/resources/prew.gif)
