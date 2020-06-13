@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/Hesowam/ClosenessBot#readme",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.2.0",
     "express": "^4.17.1",
     "ffmpeg-static": "^4.1.1",

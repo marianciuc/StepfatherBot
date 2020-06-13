@@ -9,21 +9,11 @@ const package = require("./package.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
-const MongoClient = require("mongodb").MongoClient;
 
 const minute = 60*60;
 const hour = minute*60;
 const day = hour * 24;
 
-const mongoClient = new MongoClient("mongodb://localhost:27017/", { useNewUrlParser: true });
-mongoClient.connect(function(err, client){
-
-    if(err){
-        return console.log(err);
-    }
-    // взаимодействие с базой данных
-    client.close();
-});
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
@@ -67,6 +57,16 @@ bot.once("ready", () => {
                 channel.delete("All users leave.").catch(err => console.error(err.message));
             }
         });
+    }
+
+    let count = 0;
+    for (let guild of bot.guilds.cache) {
+        guild.map(guild => {
+            if (guild.memberCount){
+                count += guild.memberCount;
+            }
+        });
+        bot.user.setActivity(`Serving ${count} members`);
     }
 });
 
