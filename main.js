@@ -1,9 +1,16 @@
 const Discord = require("discord.js");
-var mysql = require("mysql");
 const bot = new Discord.Client();
-var fs = require("fs");
-var express = require('express');
-var app     = express();
+const fs = require("fs");
+const express = require('express');
+const app = express();
+const format = require("node.date-time");
+const {prefix, token, DATABASE_PASSWORD, DATABASE_URL, DATABASE_USERNAME, DATABASE_NAME} = require("./config.json");
+const package = require("./package.json");
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const servers = require('./servers.json');
+const date = new Date();
+
+//Activate app
 app.set('port', (process.env.PORT || 5000));
 app.get('/', function(request, response) {
     var result = 'App is running'
@@ -11,13 +18,9 @@ app.get('/', function(request, response) {
 }).listen(app.get('port'), function() {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
-const format = require("node.date-time");
-const {prefix, token, DATABASE_PASSWORD, DATABASE_URL, DATABASE_USERNAME, DATABASE_NAME} = require("./config.json");
-const package = require("./package.json");
+
+//Getting commands
 bot.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const servers = require('./servers.json');
-let date = new Date();
 !function () {
     for (let file of commandFiles) {
         try {
@@ -31,13 +34,10 @@ let date = new Date();
     }
     console.log(`Added ${bot.commands.size} files.`)
 }();
-var connection = mysql.createConnection({
-    host: DATABASE_URL,
-    user: DATABASE_USERNAME,
-    password: DATABASE_PASSWORD,
-    database: DATABASE_NAME
-});
+
+//Bot login
 bot.login(token);
+
 bot.once("ready", () => {
     log("readme", "[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started\n`, true);
     bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
@@ -46,6 +46,8 @@ bot.once("ready", () => {
     console.log("Bot author: " + package.author + "\nVersion: " + package.version);
     bot.user.setActivity(` ${bot.guilds.cache.size} servers`, {type: "LISTENING"});
 });
+
+//message listener
 bot.on("message", async (message) => {
     log("readme", "Chat log " + "[" + date.format("Y-M-d H:m:S") + "]" + "[" + message.guild.name + "]" + " [" + message.author.username + "]: " + message.content + "\n", true);
     if (!message.guild && message.author.bot && !message.content.startsWith(prefix)) return;
@@ -81,6 +83,8 @@ bot.on("message", async (message) => {
             }
     }
 });
+
+//Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
     if (!oldState.channel) {
         let guildId = newState.channel.guild.id;
@@ -119,12 +123,51 @@ function log(LogNameFile, loggedMessage, boolean) {
     ;
 }
 bot.on("guildCreate", guild => {
-    log(GuildAdd & Remove, `New guild joined: ${guild.name}[id_${guild.id}]. This guild has ${guild.memberCount} members`, true);
-    bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
+
+    bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
+
+    bot.channels.fetch("721354911161254009").then(channel => {
+        let embed = new Discord.MessageEmbed()
+            .setAuthor(`${guild.name} add ${bot.user.username} to server`, `https://image.flaticon.com/icons/svg/2232/2232129.svg`, `${guild.iconURL()}`)
+            .addFields(
+                {
+                    name: 'Basic',
+                    value: `Server name: ${guild.name}(${guild.id})\nServer owner: ${guild.owner.user.username}`,
+                    inline: true
+                }, {
+                    name: 'Other',
+                    value: `Members: ${guild.memberCount}`,
+                    inline: true
+                },
+            );
+        channel.send(embed).catch(err => console.error(err));
+    });
+
 });
+
+//Bot removed from the server
 bot.on("guildDelete", guild => {
-    log(GuildAdd & Remove, `I have been removed from: ${guild.name}[id_${guild.id}].`, true);
-    bot.user.setActivity(`Serving ${bot.guilds.size} servers`);
+
+    bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
+
+    bot.channels.fetch("721354911161254009").then(channel => {
+        let embed = new Discord.MessageEmbed()
+            .setAuthor(`${guild.name} delete ${bot.user.username} from server`, "https://c7.hotpng.com/preview/417/672/896/computer-icons-computer-servers-servidor-virtual-virtual-private-server-dedicated-hosting-service-technical.jpg")
+            .addFields(
+                {
+                    name: 'Basic',
+                    value: `Server name: ${guild.name}(${guild.id})\n`
+                        +`Server owner: ${guild.owner.user.username}`,
+                    inline: true
+                }, {
+                    name: 'Other',
+                    value: `Members: ${guild.memberCount}`,
+                    inline: true
+                },
+            );
+        channel.send(embed).catch(err => console.error(err))
+    });
+
 });
 
 
