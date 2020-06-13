@@ -82,7 +82,7 @@ bot.on("message", async (message) => {
             bot.commands.get('coin-flip').execute(message);
             return 0;
         case "connect":
-            bot.commands.get('private-help').execute(message);
+            bot.commands.get('private-help').execute(message, bot);
             return 0;
         case "private":
             switch (args[0]) {

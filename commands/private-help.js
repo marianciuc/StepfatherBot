@@ -2,10 +2,11 @@ const Discord = require("discord.js");
 module.exports = {
     name: "private-help",
     description: "private help menu",
-    execute(message){
+    execute(message, bot){
         let embed = new Discord.MessageEmbed()
             .setColor("0xffd63e")
             .setAuthor("Сloseness function.")
+            .setDescription(`[Connect](https://discordapp.com/api/oauth2/authorize?client_id=700113613825769522&permissions=8&scope=bot) bot to your server.`)
             .addFields(
                 { name: '\u200B', value: 'Add or replace current private channel' +
                         '```js\nprivate add <id category> <id channel>```' },
