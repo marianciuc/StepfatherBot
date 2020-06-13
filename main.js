@@ -53,7 +53,7 @@ bot.once("ready", () => {
 
     for (let channel of bot.channels.cache) {
         channel.map(channel => {
-            if (channel.parentID && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
+            if (channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
                 channel.delete("All users leave.").catch(err => console.error(err.message));
             }
         });
@@ -177,7 +177,7 @@ bot.on("guildCreate", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`, `${guild.iconURL()}`)
+            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Added to server.")
             .setColor(0xffd63e)
             .addFields(
@@ -203,7 +203,7 @@ bot.on("guildDelete", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`, `${guild.iconURL()}`)
+            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Removed from server.")
             .setColor(0xffd63e)
             .addFields(
