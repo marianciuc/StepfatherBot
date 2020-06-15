@@ -54,11 +54,12 @@ bot.once("ready", () => {
         channel.map(channel => {
             if (channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
 
-                if (channel.viewable){
+                if (channel.viewable) {
                     intervalVoice(channel);
+                } else {
+                    channel.delete("All users leave.").catch(err => console.error(err.message));
                 }
 
-                channel.delete("All users leave.").catch(err => console.error(err.message));
             }
         });
     }
@@ -73,7 +74,6 @@ bot.once("ready", () => {
     }
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
-
 
 
 //message listener
@@ -128,14 +128,14 @@ bot.on("message", async (message) => {
     }
 });
 
-let intervalVoice = function(channel){
+let intervalVoice = function (channel) {
     setInterval(() => {
 
-        if (!channel.viewable){
+        if (!channel.viewable) {
             channel.delete("All users leave.").catch(err => console.error(err.message));
         }
 
-    }, seconds*2);
+    }, seconds * 2);
 }
 
 let intervalStatus = setInterval(() => {
