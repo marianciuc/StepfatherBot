@@ -14,10 +14,6 @@ const minute = 60*60;
 const hour = minute*60;
 const day = hour * 24;
 
-// tokens
-// stepfatherToken NzAwMTEzNjEzODI1NzY5NTIy.XueHwg.68e8Aqic6vlJIRRdTi206r1UpGI
-// testBotToken NzIyMDkzMzc5MjY5MTY1MDc3.XueJQA._O3rBvA_u5HiwLMnj3OGckiQX04
-
 //Activate app
 app.set('port', (process.env.PORT || 5000));
 app.get('/', function (request, response) {
@@ -170,7 +166,6 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
 
 //log function
 function log(LogNameFile, loggedMessage, boolean) {
-    fs.appendFileSync('./logger/' + LogNameFile + '.log', loggedMessage);
     if (boolean) console.log(loggedMessage);
 }
 
