@@ -17,7 +17,8 @@ module.exports = {
                 categoriesId: serverJson[guildId].categoriesId,
                 channelId: serverJson[guildId].channelId,
                 limit: args[1],
-                prefix: serverJson[guildId].prefix
+                prefix: serverJson[guildId].prefix,
+                welcome_channel: serverJson[guildId].welcome_channel
             }
             fs.writeFile("servers.json", JSON.stringify(serverJson), (error) => { if (error) console.log(error.message)});
         }

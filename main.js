@@ -17,7 +17,7 @@ const day = hour * 24;
 //Activate app
 app.set('port', (process.env.PORT || 5000));
 app.get('/', function (request, response) {
-    let result = 'App is running'
+    let result = 'Bot is running'
     response.send(result);
 }).listen(app.get('port'), function () {
     console.log('App is running, server is listening on port ', app.get('port'));
@@ -122,6 +122,9 @@ bot.on("message", async (message) => {
                 case "prefix":
                     bot.commands.get('change-prefix').execute(message, args);
                     return 0;
+                case "welcome":
+                    bot.commands.get('add-welcome').execute(message, args);
+                    return 0;
             }
             return 0;
     }
@@ -190,9 +193,20 @@ function log(LogNameFile, loggedMessage, boolean) {
 
 //Member add
 bot.on('guildMemberAdd', member => {
-    if (servers[member.guild.id] && servers[member.guild.id].welcomeChannelId) {
-        member.guild.channels.cache.get(`${servers[member.guild.id].welcomeChannelId}`).then(channel => {
-            channel.send("Hello");
+    if (prefix == '?') return;
+    if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
+        member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
+            channel.send(`Hello, ***${member.user.tag}***!`);
+        })
+    }
+});
+
+//Member out
+bot.on("guildMemberRemove", member => {
+    if (prefix == '?') return;
+    if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
+        member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
+            channel.send(`***${member.user.tag}*** has been leaved from the server`);
         })
     }
 });
