@@ -4,14 +4,14 @@ const fs = require("fs");
 const express = require('express');
 const app = express();
 const format = require("node.date-time");
-const {prefix, token, DATABASE_PASSWORD, DATABASE_URL, DATABASE_USERNAME, DATABASE_NAME} = require("./config.json");
+const {prefix, token} = require("./config.json");
 const package = require("./package.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
 
-const minute = 60*60;
-const hour = minute*60;
+const minute = 1000 * 60;
+const hour = minute * 60;
 const day = hour * 24;
 
 //Activate app
@@ -61,7 +61,7 @@ bot.once("ready", () => {
     let count = 0;
     for (let guild of bot.guilds.cache) {
         guild.map(guild => {
-            if (guild.memberCount){
+            if (guild.memberCount) {
                 count += guild.memberCount;
             }
         });
@@ -74,7 +74,7 @@ bot.on("message", async (message) => {
     //checking for commands
     if (!message.guild && message.author.bot && !message.content.startsWith(prefix)) return;
     const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);
-    if (message.content.substr(0,prefix.length) != prefix) return;
+    if (message.content.substr(0, prefix.length) != prefix) return;
     const command = args.shift();
 
     switch (command) {
@@ -108,28 +108,38 @@ bot.on("message", async (message) => {
                     bot.commands.get('change-limit-for-private-rooms').execute(args, message);
                     return 0;
             }
+        case "manage":
+            switch (args[0]) {
+                case "help":
+                    bot.commands.get('manage-help').execute(message);
+                    return 0;
+                // case "welcome":
+                //     bot.commands.get('change-limit-for-private-rooms').execute(args, message);
+                //     return 0;
+            }
+            return 0;
     }
 });
 
-let intervalStatus = setInterval(()=> {
+let intervalStatus = setInterval(() => {
     let sq = Math.floor(Math.random() * 100);
-    if (sq < 50){
+    if (sq < 50) {
         let count = 0;
         for (let guild of bot.guilds.cache) {
             guild.map(guild => {
-                if (guild.memberCount){
+                if (guild.memberCount) {
                     count += guild.memberCount;
                 }
             });
             bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
         }
-    } else if(sq > 50){
+    } else if (sq > 50) {
         bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
     }
 
     console.log("changed status");
 
-}, hour*6);
+}, hour/2);
 
 //Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
@@ -172,6 +182,16 @@ function log(LogNameFile, loggedMessage, boolean) {
     if (boolean) console.log(loggedMessage);
 }
 
+
+//Member add
+bot.on('guildMemberAdd', member => {
+    if (servers[member.guild.id] && servers[member.guild.id].welcomeChannelId) {
+        member.guild.channels.cache.get(`${servers[member.guild.id].welcomeChannelId}`).then(channel => {
+            channel.send("Hello");
+        })
+    }
+});
+
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
 
@@ -179,14 +199,14 @@ bot.on("guildCreate", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
+            .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Added to server.")
             .setColor(0xffd63e)
             .addFields(
                 {
                     name: 'Basic',
-                    value: `Server name: ${guild.name}(${guild.id})\n`
-                        + `Server owner: ${guild.owner.user.tag}`,
+                    value: `**Server name:** ${guild.name}(${guild.id})\n`
+                        + `**Server owner:** ${guild.owner.user.tag}`,
                     inline: true
                 }, {
                     name: 'Other',
@@ -205,14 +225,14 @@ bot.on("guildDelete", guild => {
 
     bot.channels.fetch("721354911161254009").then(channel => {
         let embed = new Discord.MessageEmbed()
-            .setAuthor(`${guild.name}`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
+            .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Removed from server.")
             .setColor(0xffd63e)
             .addFields(
                 {
                     name: 'Basic',
-                    value: `Server name: ${guild.name}(${guild.id})\n`
-                        + `Server owner: ${guild.owner.user.tag}`,
+                    value: `**Server name:** ${guild.name}(${guild.id})\n`
+                        + `**Server owner:** ${guild.owner.user.tag}`,
                     inline: true
                 }, {
                     name: 'Other',
