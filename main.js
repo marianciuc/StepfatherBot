@@ -65,7 +65,7 @@ bot.once("ready", () => {
                 count += guild.memberCount;
             }
         });
-        bot.user.setActivity(`Serving ${count} members`);
+        bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     }
 });
 
@@ -121,16 +121,19 @@ let intervalStatus = setInterval(()=> {
                     count += guild.memberCount;
                 }
             });
-            bot.user.setActivity(`Serving ${count} members`);
+            bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
         }
     } else if(sq > 50){
-        bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
+        bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
     }
+
+    console.log("changed status");
 
 }, hour*6);
 
 //Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
+    if (prefix == '?') return;
     if (!oldState.channel) {//checking VoiceState status
 
         let guildId = newState.channel.guild.id; //Getting guild id
