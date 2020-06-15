@@ -65,21 +65,8 @@ bot.once("ready", () => {
                 count += guild.memberCount;
             }
         });
-        bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     }
-    bot.channels.fetch("721354911161254009").then(channel => {
-        let count = 0;
-        for (let guild of bot.guilds.cache) {
-            guild.map(guild => {
-                if (guild.memberCount) {
-                    count += guild.memberCount;
-                }
-                if (guild.name) {
-                    channel.send(`${count} members, ${guild.name}`);
-                }
-            });
-        }
-    });
+    bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
 
 //message listener
@@ -144,7 +131,6 @@ let intervalStatus = setInterval(() => {
                     count += guild.memberCount;
                 }
             });
-            bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
         }
     } else if (sq > 50) {
         bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
@@ -152,7 +138,7 @@ let intervalStatus = setInterval(() => {
 
     console.log("changed status");
 
-}, hour/2);
+}, hour / 2);
 
 //Closeness function
 bot.on("voiceStateUpdate", (oldState, newState) => {
