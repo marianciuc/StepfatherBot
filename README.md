@@ -2,7 +2,7 @@
     </a>
     <h1>Stepfather bot</h1>
     <h4>A multipurpose Discord bot built with <a href="https://discord.js.org/#/" target="_blank">discord.js</a>.<br>
-    [![CodeFactor](https://www.codefactor.io/repository/github/hesowam/stepfatherbot/badge/master?s=bc6f6de950d55fc33d18c69b917a90a4ef72be86)](https://www.codefactor.io/repository/github/hesowam/stepfatherbot/overview/master)
+    <img src="https://www.codefactor.io/repository/github/hesowam/stepfatherbot/badge/master?s=bc6f6de950d55fc33d18c69b917a90a4ef72be86">
     </h4>
 </div>
 
