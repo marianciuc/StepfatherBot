@@ -53,6 +53,11 @@ bot.once("ready", () => {
     for (let channel of bot.channels.cache) {
         channel.map(channel => {
             if (channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
+
+                if (channel.viewable){
+                    intervalVoice(channel);
+                }
+
                 channel.delete("All users leave.").catch(err => console.error(err.message));
             }
         });
@@ -68,6 +73,8 @@ bot.once("ready", () => {
     }
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
+
+
 
 //message listener
 bot.on("message", async (message) => {
@@ -120,6 +127,16 @@ bot.on("message", async (message) => {
             return 0;
     }
 });
+
+let intervalVoice = function(channel){
+    setInterval(() => {
+
+        if (!channel.viewable){
+            channel.delete("All users leave.").catch(err => console.error(err.message));
+        }
+
+    }, seconds*2);
+}
 
 let intervalStatus = setInterval(() => {
     let sq = Math.floor(Math.random() * 100);
