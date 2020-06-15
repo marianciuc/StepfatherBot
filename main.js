@@ -67,6 +67,19 @@ bot.once("ready", () => {
         });
         bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     }
+    bot.channels.fetch("721354911161254009").then(channel => {
+        let count = 0;
+        for (let guild of bot.guilds.cache) {
+            guild.map(guild => {
+                if (guild.memberCount) {
+                    count += guild.memberCount;
+                }
+                if (guild.name) {
+                    channel.send(`${count} members, ${guild.name}`);
+                }
+            });
+        }
+    });
 });
 
 //message listener
