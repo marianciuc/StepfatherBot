@@ -16,9 +16,11 @@ module.exports = {
             serverJson[guildId] = {
                 categoriesId: serverJson[guildId].categoriesId,
                 channelId: serverJson[guildId].channelId,
-                limit: args[1]
+                limit: args[1],
+                prefix: serverJson[guildId].prefix
             }
             fs.writeFile("servers.json", JSON.stringify(serverJson), (error) => { if (error) console.log(error.message)});
         }
+        message.channel.send(`Private channel limit has been changed to ${args[1]}`);
     }
 }

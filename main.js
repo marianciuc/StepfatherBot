@@ -53,13 +53,7 @@ bot.once("ready", () => {
     for (let channel of bot.channels.cache) {
         channel.map(channel => {
             if (channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
-
-                if (channel.viewable) {
-                    intervalVoice(channel);
-                } else {
                     channel.delete("All users leave.").catch(err => console.error(err.message));
-                }
-
             }
         });
     }
@@ -79,14 +73,19 @@ bot.once("ready", () => {
 //message listener
 bot.on("message", async (message) => {
     //checking for commands
-    if (!message.guild && message.author.bot && !message.content.startsWith(prefix)) return;
-    const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);
-    if (message.content.substr(0, prefix.length) != prefix) return;
+    let newPrefix = prefix;
+    let guildId = message.guild.id;
+    if (servers[guildId].prefix){
+        newPrefix = servers[guildId].prefix;
+    }
+    if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;
+    const args = message.content.toLowerCase().slice(newPrefix.length).split(/ +/);
+    if (message.content.substr(0, newPrefix.length) != newPrefix) return;
     const command = args.shift();
 
     switch (command) {
         case "help":
-            bot.commands.get('help-menu').execute(message);
+            bot.commands.get('help-menu').execute(message, newPrefix);
             return 0;
         case "purge":
             bot.commands.get('clear-chat').execute(message);
@@ -104,7 +103,7 @@ bot.on("message", async (message) => {
             bot.commands.get('coin-flip').execute(message);
             return 0;
         case "connect":
-            bot.commands.get('private-help').execute(message, bot);
+            bot.commands.get('private-help').execute(message, newPrefix);
             return 0;
         case "private":
             switch (args[0]) {
@@ -120,23 +119,13 @@ bot.on("message", async (message) => {
                 case "help":
                     bot.commands.get('manage-help').execute(message);
                     return 0;
-                // case "welcome":
-                //     bot.commands.get('change-limit-for-private-rooms').execute(args, message);
-                //     return 0;
+                case "prefix":
+                    bot.commands.get('change-prefix').execute(message, args);
+                    return 0;
             }
             return 0;
     }
 });
-
-let intervalVoice = function (channel) {
-    setInterval(() => {
-
-        if (!channel.viewable) {
-            channel.delete("All users leave.").catch(err => console.error(err.message));
-        }
-
-    }, seconds * 2);
-}
 
 let intervalStatus = setInterval(() => {
     let sq = Math.floor(Math.random() * 100);
