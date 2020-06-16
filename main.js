@@ -42,10 +42,12 @@ bot.login(token).then(() => console.log("Login successful"));
 
 bot.once("ready", () => {
     if (prefix != '?') {
+
         log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
         bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
             log(link);
         }).catch(error => log(error));
+
         for (let channel of bot.channels.cache) {
             channel.map(channel => {
                 if (channel && channel != null && channel.type == "voice") {
@@ -58,10 +60,12 @@ bot.once("ready", () => {
                             console.log(count);
                             if (count == 0) {
                                 channel.delete("All users leave.").catch(err => log(err.message));
+                                log('founded channel');
                             } else {
                                 console.log(channel.name);
                                 let delInt = setInterval(() => {
                                     let count = 0;
+                                    log('founded channel interval');
                                     if (channel) {
                                         channel.members.map(member => {
                                             count++;
