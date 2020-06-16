@@ -44,11 +44,10 @@ bot.login(token).then(r => console.log("Login successful"));
 bot.once("ready", () => {
     if (prefix != '?'){
         log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
+        bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
+            log(link);
+        }).catch(error => log(error));
     }
-
-    bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
-        console.log(link);
-    });
 
     let count = 0;
     for (let guild of bot.guilds.cache) {
