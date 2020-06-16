@@ -41,6 +41,15 @@ bot.commands = new Discord.Collection();
 bot.login(token).then(() => console.log("Login successful"));
 
 bot.once("ready", () => {
+    let count = 0;
+    for (let guild of bot.guilds.cache) {
+        guild.map(guild => {
+            if (guild.memberCount) {
+                count += guild.memberCount;
+            }
+        });
+    }
+    bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     if (prefix != '?') {
 
         log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
@@ -51,7 +60,7 @@ bot.once("ready", () => {
         for (let channel of bot.channels.cache) {
             channel.map(channel => {
                 if (channel && channel != null && channel.type == "voice") {
-                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId || servers[channel.guild.id].channelId == channel.parent.id) {
+                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId || servers[channel.guild.id].channelId != undefined && servers[channel.guild.id].channelId == channel.parent.id) {
                         if (channel.id != servers[channel.guild.id].channelId) {
                             let count = 0;
                             channel.members.map(member => {
@@ -83,16 +92,6 @@ bot.once("ready", () => {
             });
         }
     }
-
-    let count = 0;
-    for (let guild of bot.guilds.cache) {
-        guild.map(guild => {
-            if (guild.memberCount) {
-                count += guild.memberCount;
-            }
-        });
-    }
-    bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
 
 
