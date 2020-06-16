@@ -5,7 +5,6 @@ const express = require('express');
 const app = express();
 const format = require("node.date-time");
 const {prefix, token} = require("./config.json");
-const package = require("./package.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
@@ -39,14 +38,47 @@ bot.commands = new Discord.Collection();
 }();
 
 //Bot login
-bot.login(token).then(r => console.log("Login successful"));
+bot.login(token).then(() => console.log("Login successful"));
 
 bot.once("ready", () => {
-    if (prefix != '?'){
+    if (prefix != '?') {
         log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
         bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
             log(link);
         }).catch(error => log(error));
+        for (let channel of bot.channels.cache) {
+            channel.map(channel => {
+                if (channel && channel != null && channel.type == "voice") {
+                    if (servers[channel.guild.id] || servers[channel.guild.id].channelId == channel.parent.id) {
+                        if (channel.id != servers[channel.guild.id].channelId) {
+                            let count = 0;
+                            channel.members.map(member => {
+                                count++;
+                            })
+                            console.log(count);
+                            if (count == 0) {
+                                channel.delete("All users leave.").catch(err => log(err.message));
+                            } else {
+                                console.log(channel.name);
+                                let delInt = setInterval(() => {
+                                    let count = 0;
+                                    if (channel) {
+                                        channel.members.map(member => {
+                                            count++;
+                                        });
+                                        if (count == 0) {
+                                            channel.delete("All users leave.").catch(err => log(err.message));
+                                            clearInterval(delInt);
+                                            return;
+                                        }
+                                    }
+                                }, 2000);
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     let count = 0;
@@ -57,20 +89,6 @@ bot.once("ready", () => {
             }
         });
     }
-
-    for (let channel of bot.channels.cache) {
-        channel.map(channel => {
-            if (channel && channel != null && channel.type == "voice") {
-                if (servers[channel.guild.id] || servers[channel.guild.id].channelId == channel.parent.id){
-                    if (channel.id != servers[channel.guild.id].channelId){
-                        if (channel.viewable === false){
-                            console.log(channel.name);
-                        }
-                    }
-                }
-            }
-        });
-    }
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
 
@@ -78,7 +96,7 @@ bot.once("ready", () => {
 //message listener
 bot.on("message", async (message) => {
     let newPrefix = prefix;
-    if (servers[message.guild.id].prefix){
+    if (servers[message.guild.id].prefix) {
         newPrefix = servers[message.guild.id].prefix;
     }
     if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;
@@ -197,7 +215,7 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
                         }
                     }, 5000);
                 })
-                return;
+                return 0;
             }
         }
     }
@@ -225,7 +243,7 @@ bot.on("guildMemberRemove", member => {
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
 
-    bot.user.setActivity(`!help`,{type: 'LISTENING'});
+    bot.user.setActivity(`!help`, {type: 'LISTENING'});
     servers[guild.id] = {
         categoriesId: undefined,
         channelId: undefined,
