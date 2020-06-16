@@ -52,29 +52,20 @@ bot.once("ready", () => {
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     if (prefix != '?') {
 
-        log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
-        bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
-            log(link);
-        }).catch(error => log(error));
-
         for (let channel of bot.channels.cache) {
             channel.map(channel => {
                 if (channel && channel != null && channel.type == "voice") {
-                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId && servers[channel.guild.id].channelId == channel.parent.id) {
+                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId && servers[channel.guild.id].categoriesId == channel.parent.id) {
                         if (channel.id != servers[channel.guild.id].channelId) {
                             let count = 0;
                             channel.members.map(member => {
                                 count++;
                             })
-                            console.log(count);
                             if (count == 0) {
                                 channel.delete("All users leave.").catch(err => log(err.message));
-                                log('founded channel');
                             } else {
-                                console.log(channel.name);
                                 let delInt = setInterval(() => {
                                     let count = 0;
-                                    log('founded channel interval');
                                     if (channel) {
                                         channel.members.map(member => {
                                             count++;
@@ -91,6 +82,11 @@ bot.once("ready", () => {
                 }
             });
         }
+
+        log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
+        bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
+            log(link);
+        }).catch(error => log(error));
     }
 });
 
