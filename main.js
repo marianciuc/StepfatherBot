@@ -210,7 +210,7 @@ bot.on("guildMemberRemove", member => {
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
 
-    bot.user.setActivity(`${bot.guilds.cache.size} servers`);
+    bot.user.setActivity(`!help`,{type: 'LISTENING'});
     servers[guild.id] = {
         categoriesId: undefined,
         channelId: undefined,

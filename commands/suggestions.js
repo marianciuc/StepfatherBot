@@ -3,6 +3,10 @@ const Discord = require(`discord.js`);
 module.exports = {
         name: "suggestions",
     execute(message, prefix, bot){
+        let url = undefined;
+        message.attachments.map(attachment => {
+            url = attachment.url;
+        });
         const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);
         let content = " ";
         for (let i = 1; i<args.length;i++){
@@ -17,7 +21,7 @@ module.exports = {
                 .setColor(0xffd63e)
                 .setAuthor(`${message.author.tag} from ${message.guild.name}`, `${message.author.avatarURL()}`)
                 .setDescription(`${content}`,)
-                .setImage("https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif")
+                .setImage(`${url != undefined ? url :"https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif"}`)
                 .setTimestamp();
             channel.send(embed).catch(err => console.error(err));
         });
