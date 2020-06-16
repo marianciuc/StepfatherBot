@@ -57,6 +57,20 @@ bot.once("ready", () => {
             }
         });
     }
+
+    for (let channel of bot.channels.cache) {
+        channel.map(channel => {
+            if (channel && channel != null && channel.type == "voice") {
+                if (servers[channel.guild.id] || servers[channel.guild.id].channelId == channel.parent.id){
+                    if (channel.id != servers[channel.guild.id].channelId){
+                        if (channel.viewable === false){
+                            console.log(channel.name);
+                        }
+                    }
+                }
+            }
+        });
+    }
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 });
 

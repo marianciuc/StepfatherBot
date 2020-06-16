@@ -5,7 +5,7 @@ module.exports = {
         for (let guild of bot.guilds.cache) {
             guild.map(guild => {
                 if (guild.name) {
-                    count ="\n"+count + guild.name + ": " + guild.memberCount+" members";
+                    count =count + "\n"+guild.name + ": " + guild.memberCount+" members";
                 }
             });
         }
