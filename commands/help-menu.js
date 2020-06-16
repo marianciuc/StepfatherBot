@@ -5,12 +5,15 @@ module.exports = {
     description: "menu",
     execute(msg, prefix){
       let embed = new Discord.MessageEmbed()
-          .setDescription(`To connect the bot to your server and use private chat function write:+`+ "```c\n"+prefix+"connect```")
-          .setAuthor("Stepfather Help list",)
+          .setDescription(`To connect the bot to your server and use private chat function write:`+ "```c\n"+prefix+"connect```")
+          .setAuthor("🤖 Stepfather Help list",)
           .setColor(0xffd63e)
           .addFields(
+              {name: '\u200B', value: "\n" +
+                      "Get a list of guild administration help (configure the welcome channel, change the bot prefix for the server, and much more)" +
+                      "\n```js\n"+prefix+"manage help```",inline: false},
               {name: '\u200B', value: "Show a list of commands ```"+prefix+"help```", inline: true},
-              {name: '\u200B', value: "Flip a coin ```"+prefix+"flip```", inline: true},
+              {name: '\u200B', value: "🐬 Flip a coin ```"+prefix+"flip```", inline: true},
               {name: '\u200B', value: "Private help list ```"+prefix+"connect```", inline: true},
               {name: '\u200B', value: "Delete last n messages ```"+prefix+"purge <n>```", inline: true},
               {name: '\u200B', value: "Get embedded message ```"+prefix+"embed <message content>```", inline: true},

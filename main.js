@@ -127,6 +127,8 @@ bot.on("message", async (message) => {
                     return 0;
             }
             return 0;
+        case "botinfo":
+            bot.commands.get('bot-info').execute(message, bot);
     }
 });
 
@@ -193,7 +195,6 @@ function log(LogNameFile, loggedMessage, boolean) {
 
 //Member add
 bot.on('guildMemberAdd', member => {
-    if (prefix == '?') return;
     if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
         member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
             channel.send(`Hello, ***${member.user.tag}***!`);
@@ -203,7 +204,6 @@ bot.on('guildMemberAdd', member => {
 
 //Member out
 bot.on("guildMemberRemove", member => {
-    if (prefix == '?') return;
     if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
         member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
             channel.send(`***${member.user.tag}*** has been leaved from the server`);
