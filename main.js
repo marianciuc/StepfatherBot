@@ -67,9 +67,6 @@ bot.on("message", async (message) => {
     //checking for commands
     let newPrefix = prefix;
     let guildId = message.guild.id;
-    if (servers[guildId].prefix != '!'){
-        newPrefix = servers[guildId].prefix;
-    }
     if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;
     const args = message.content.toLowerCase().slice(newPrefix.length).split(/ +/);
     if (message.content.substr(0, newPrefix.length) != newPrefix) return;
