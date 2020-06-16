@@ -1,7 +1,7 @@
 const Discord = require(`discord.js`);
 
 module.exports = {
-    name: "suggestions",
+        name: "suggestions",
     execute(message, prefix, bot){
         const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);
         let content = " ";
@@ -9,10 +9,10 @@ module.exports = {
             content = content +" "+ args[i];
         }
         if (message.length > 500){
-            message.reply("Message must be less than 500 characters");
+            message.reply("❌ Message must be less than 500 characters");
             return 0;
         }
-        bot.channels.fetch("722083954420744345").then(channel => {
+        bot.channels.fetch("722474763456348240").then(channel => {
             let embed = new Discord.MessageEmbed()
                 .setColor(0xffd63e)
                 .setAuthor(`${message.author.tag} from ${message.guild.name}`, `${message.author.avatarURL()}`)

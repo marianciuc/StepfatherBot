@@ -12,7 +12,6 @@ module.exports = {
                 .setColor(0xffd63e)
                 .setImage(`${user.avatarURL()}`)
         });
-        console.log(message.mentions);
         for (users in avatarList){
             message.channel.send(avatarList[users]);
         }

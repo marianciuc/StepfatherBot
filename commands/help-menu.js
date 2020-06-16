@@ -12,7 +12,11 @@ module.exports = {
               {name: '\u200B', value: "\n" +
                       "Get a list of guild administration help (configure the welcome channel, change the bot prefix for the server, and much more)" +
                       "\n```js\n"+prefix+"manage help```",inline: false},
+              {name: '\u200B', value: "Send bug report ```"+prefix+"bug <report text>```", inline: true},
+              {name: '\u200B', value: "Send suggestions message ```"+prefix+"sug <suggestions message>```", inline: true},
               {name: '\u200B', value: "Show a list of commands ```"+prefix+"help```", inline: true},
+              {name: '\u200B', value: "Yes or Not ```"+prefix+"yn <question>```", inline: true},
+              {name: '\u200B', value: "Get bot info ```"+prefix+"status```", inline: true},
               {name: '\u200B', value: "🐬 Flip a coin ```"+prefix+"flip```", inline: true},
               {name: '\u200B', value: "Private help list ```"+prefix+"connect```", inline: true},
               {name: '\u200B', value: "Delete last n messages ```"+prefix+"purge <n>```", inline: true},

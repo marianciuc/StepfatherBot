@@ -42,18 +42,18 @@ bot.commands = new Discord.Collection();
 bot.login(token).then(r => console.log("Login successful"));
 
 bot.once("ready", () => {
-    log("readme", "[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started\n`, true);
+    if (prefix != '?'){
+        log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
+    }
 
     bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
         console.log(link);
     });
 
-    console.log("Bot author: " + package.author + "\nVersion: " + package.version);
-
     for (let channel of bot.channels.cache) {
         channel.map(channel => {
-            if (channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
-                    channel.delete("All users leave.").catch(err => console.error(err.message));
+            if (channel && channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
+                channel.delete("All users leave.").catch(err => console.error(err.message));
             }
         });
     }
@@ -108,7 +108,7 @@ bot.on("message", async (message) => {
         case "yn":
             bot.commands.get('yon').execute(message, newPrefix);
             return 0;
-        case "suggestions":
+        case "sug":
             bot.commands.get('suggestions').execute(message, newPrefix, bot);
             return 0;
         case "connect":
@@ -136,7 +136,7 @@ bot.on("message", async (message) => {
                     return 0;
             }
             return 0;
-        case "botinfo":
+        case "status":
             bot.commands.get('bot-info').execute(message, bot);
     }
 });
@@ -152,11 +152,12 @@ let intervalStatus = setInterval(() => {
                 }
             });
         }
+        bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
+        log(`Changed status to ${count} members`);
     } else if (sq > 50) {
         bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
+        log(`Changed status to ${bot.guilds.cache.size} servers`);
     }
-
-    console.log("changed status");
 
 }, hour / 2);
 
@@ -196,27 +197,22 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
     }
 });
 
-//log function
-function log(LogNameFile, loggedMessage, boolean) {
-    if (boolean) console.log(loggedMessage);
-}
-
 
 //Member add
 bot.on('guildMemberAdd', member => {
     if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
-        member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
-            channel.send(`Hello, ***${member.user.tag}***!`);
-        })
+        bot.channels.fetch(`${servers[member.guild.id].welcome_channel}}`).then(channel => {
+            channel.send(`Hello, ***${member.user.tag}***`);
+        });
     }
 });
 
 //Member out
 bot.on("guildMemberRemove", member => {
     if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
-        member.guild.channels.cache.get(`${servers[member.guild.id].welcome_channel}`).then(channel => {
+        bot.channels.fetch(`${servers[member.guild.id].welcome_channel}}`).then(channel => {
             channel.send(`***${member.user.tag}*** has been leaved from the server`);
-        })
+        });
     }
 });
 
@@ -225,7 +221,7 @@ bot.on("guildCreate", guild => {
 
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
 
-    bot.channels.fetch("721354911161254009").then(channel => {
+    bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Added to server.")
@@ -251,7 +247,7 @@ bot.on("guildDelete", guild => {
 
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
 
-    bot.channels.fetch("721354911161254009").then(channel => {
+    bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Removed from server.")
@@ -270,4 +266,17 @@ bot.on("guildDelete", guild => {
             );
         channel.send(embed).catch(err => console.error(err));
     });
+});
+
+
+//bot log
+
+let log = (text) => {
+    bot.channels.fetch(`722474315886362735`).then(channel => {
+        channel.send(`${text}`);
+    });
+}
+
+bot.on("error", (error) => {
+    log(`${error}`);
 });

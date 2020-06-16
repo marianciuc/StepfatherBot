@@ -24,7 +24,7 @@ module.exports = {
             fs.writeFile("servers.json", JSON.stringify(serverJson), (error) => {
                 if (error) console.log(error.message)
             });
-        message.channel.send(`***New private channel name***: ${message.guild.channels.cache.get(args[2]).name}\n`+
+        message.channel.send(`**Private room successful added**\n***New private channel name***: ${message.guild.channels.cache.get(args[2]).name}\n`+
             `***Category name:*** ${message.guild.channels.cache.get(args[1])}`);
     }
 }
