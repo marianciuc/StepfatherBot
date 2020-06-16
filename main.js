@@ -50,14 +50,6 @@ bot.once("ready", () => {
         console.log(link);
     });
 
-    for (let channel of bot.channels.cache) {
-        channel.map(channel => {
-            if (channel && channel.parentID && channel.categoriesId && channel.parentID == servers[channel.guild.id].categoriesId && channel.id != servers[channel.guild.id].channelId) {
-                channel.delete("All users leave.").catch(err => console.error(err.message));
-            }
-        });
-    }
-
     let count = 0;
     for (let guild of bot.guilds.cache) {
         guild.map(guild => {
