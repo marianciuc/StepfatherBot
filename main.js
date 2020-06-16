@@ -51,7 +51,7 @@ bot.once("ready", () => {
         for (let channel of bot.channels.cache) {
             channel.map(channel => {
                 if (channel && channel != null && channel.type == "voice") {
-                    if (servers[channel.guild.id] || servers[channel.guild.id].channelId == channel.parent.id) {
+                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId || servers[channel.guild.id].channelId == channel.parent.id) {
                         if (channel.id != servers[channel.guild.id].channelId) {
                             let count = 0;
                             channel.members.map(member => {
@@ -73,7 +73,6 @@ bot.once("ready", () => {
                                         if (count == 0) {
                                             channel.delete("All users leave.").catch(err => log(err.message));
                                             clearInterval(delInt);
-                                            return;
                                         }
                                     }
                                 }, 2000);
