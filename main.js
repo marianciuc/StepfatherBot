@@ -64,9 +64,11 @@ bot.once("ready", () => {
 
 //message listener
 bot.on("message", async (message) => {
-    //checking for commands
     let newPrefix = prefix;
-    let guildId = message.guild.id;
+    if (servers[message.guild.id].prefix){
+        newPrefix = servers[message.guild.id].prefix;
+        console.log(`${newPrefix}`);
+    }
     if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;
     const args = message.content.toLowerCase().slice(newPrefix.length).split(/ +/);
     if (message.content.substr(0, newPrefix.length) != newPrefix) return;
@@ -208,8 +210,17 @@ bot.on("guildMemberRemove", member => {
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
 
-    bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
-
+    bot.user.setActivity(`${bot.guilds.cache.size} servers`);
+    servers[guild.id] = {
+        categoriesId: undefined,
+        channelId: undefined,
+        limit: 2,
+        prefix: prefix,
+        welcome_channel: undefined
+    }
+    fs.writeFile("servers.json", JSON.stringify(config), (error) => {
+        if (error) console.log(error.message)
+    });
     bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
