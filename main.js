@@ -97,6 +97,9 @@ bot.on("message", async (message) => {
         case "yn":
             bot.commands.get('yon').execute(message, newPrefix);
             return 0;
+        case "getserverlist":
+            bot.commands.get('get-server-list').execute(message, bot);
+            return 0;
         case "sug":
             bot.commands.get('suggestions').execute(message, newPrefix, bot);
             return 0;
