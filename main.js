@@ -102,6 +102,12 @@ bot.on("message", async (message) => {
         case "flip":
             bot.commands.get('coin-flip').execute(message);
             return 0;
+        case "bug":
+            bot.commands.get('bug').execute(message, newPrefix, bot);
+            return 0;
+        case "suggestions":
+            bot.commands.get('suggestions').execute(message, newPrefix, bot);
+            return 0;
         case "connect":
             bot.commands.get('private-help').execute(message, newPrefix);
             return 0;
