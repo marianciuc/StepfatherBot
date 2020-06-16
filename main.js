@@ -105,6 +105,9 @@ bot.on("message", async (message) => {
         case "bug":
             bot.commands.get('bug').execute(message, newPrefix, bot);
             return 0;
+        case "yn":
+            bot.commands.get('yon').execute(message, newPrefix);
+            return 0;
         case "suggestions":
             bot.commands.get('suggestions').execute(message, newPrefix, bot);
             return 0;
