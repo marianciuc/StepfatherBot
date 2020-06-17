@@ -209,6 +209,12 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
                     newState.setChannel(clone, "Closeness function activated.").catch(error => {
                         console.error(error)
                     });
+                    clone.overwritePermissions([
+                        {
+                            id: newState.member.user.id,
+                            allow: ['MANAGE_CHANNELS'],
+                        },
+                    ], 'Needed to change permissions');
                     let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
                             clone.delete("All users leave.").catch(err => console.error(err.message));
