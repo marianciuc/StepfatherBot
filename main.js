@@ -7,6 +7,7 @@ const {prefix, token} = require("./config.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const minute = 1000 * 60;
 const hour = minute * 60;
@@ -248,7 +249,7 @@ bot.on("guildMemberRemove", member => {
 
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
-
+    sendToTelegram(`${guild.name} add bot to server.\n ${guild.memberCount} members`);
     bot.user.setActivity(`!help`, {type: 'LISTENING'});
     servers[guild.id] = {
         categoriesId: undefined,
@@ -285,7 +286,7 @@ bot.on("guildCreate", guild => {
 bot.on("guildDelete", guild => {
 
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
-
+    sendToTelegram(`${guild.name} remove bot from server.`);
     bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
@@ -314,8 +315,17 @@ let log = (text) => {
     bot.channels.fetch(`722474315886362735`).then(channel => {
         channel.send(`${text}`);
     });
+    sendToTelegram(message);
 }
 
 bot.on("error", (error) => {
     log(`${error}`);
+    sendToTelegram(error);
 });
+function sendToTelegram(message) {
+    const token = `1202079323:AAG4e9PiTHQpoI2OzACs6isGVVkKLIqBoH0`;
+    let url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=-1001373973545&text=`
+    let xhttp = new XMLHttpRequest();
+    xhttp.open("get", url + message, true);
+    xhttp.send();
+}
