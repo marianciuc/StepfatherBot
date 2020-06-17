@@ -215,7 +215,6 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
                             allow: ['MANAGE_CHANNELS'],
                         },
                     ], 'Needed to change permissions');
-                    log(newState.member.user.id);
                     let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
                             clone.delete("All users leave.").catch(err => console.error(err.message));
