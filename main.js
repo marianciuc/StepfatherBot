@@ -3,7 +3,6 @@ const bot = new Discord.Client();
 const fs = require("fs");
 const express = require('express');
 const app = express();
-const format = require("node.date-time");
 const {prefix, token} = require("./config.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
@@ -11,7 +10,6 @@ const date = new Date();
 
 const minute = 1000 * 60;
 const hour = minute * 60;
-const day = hour * 24;
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
@@ -51,7 +49,6 @@ bot.once("ready", () => {
     }
     bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
     if (prefix != '?') {
-
         for (let channel of bot.channels.cache) {
             channel.map(channel => {
                 if (channel && channel != null && channel.type == "voice") {
@@ -82,7 +79,6 @@ bot.once("ready", () => {
                 }
             });
         }
-
         log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
         bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
             log(link);
@@ -93,8 +89,20 @@ bot.once("ready", () => {
 
 //message listener
 bot.on("message", async (message) => {
+    if (!message.guild && !message.author.bot){
+        let embedElement = new Discord.MessageEmbed()
+            .setColor(0xffd63e)
+            .setAuthor(`${bot.user.username}`)
+            .setDescription("To use the bot, just write `!Help` to the chat of your guild." +
+                "\nJoin our guild [here](https://discord.gg/mUnUzWt).\n"+
+                "To connect the bot to your guild, follow the [link](https://discordapp.com/oauth2/authorize?client_id=700113613825769522&scope=bot&permissions=2146958839)")
+            .setImage(`${"https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif"}`)
+            .setTimestamp();
+        message.author.send(embedElement);
+        return;
+    }
     let newPrefix = prefix;
-    if (servers[message.guild.id].prefix) {
+    if (message.guild && servers[message.guild.id].prefix) {
         newPrefix = servers[message.guild.id].prefix;
     }
     if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;

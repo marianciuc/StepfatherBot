@@ -1,7 +1,7 @@
 {
   "script": "main.js",
   "watch": true,
-  "ignore_watch": ["servers.json"],
+  "ignore_watch": ["servers.json", "node_modules","README.md"],
   "watch_options": {
     "followSymlinks": false
   },
