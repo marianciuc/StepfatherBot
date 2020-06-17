@@ -7,6 +7,7 @@ const {prefix, token} = require("./config.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
+const format = require('dateformat');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const minute = 1000 * 60;
@@ -80,7 +81,7 @@ bot.once("ready", () => {
                 }
             });
         }
-        log("[" + date.format("Y-M-d H:m:S") + "]" + ` ${bot.user.username} has started`);
+        log("[" + date + ` ${bot.user.username} has started`);
         bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
             log(link);
         }).catch(error => log(error));
