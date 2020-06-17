@@ -7,7 +7,6 @@ const {prefix, token} = require("./config.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const servers = require('./servers.json');
 const date = new Date();
-const format = require('dateformat');
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const minute = 1000 * 60;
