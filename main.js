@@ -80,7 +80,7 @@ bot.once("ready", () => {
                 }
             });
         }
-        log("[" + date + ` ${bot.user.username} has started`);
+        log(`${bot.user.username} has started`);
         bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
             log(link);
         }).catch(error => log(error));
@@ -315,7 +315,7 @@ let log = (text) => {
     bot.channels.fetch(`722474315886362735`).then(channel => {
         channel.send(`${text}`);
     });
-    sendToTelegram(message);
+    sendToTelegram(text);
 }
 
 bot.on("error", (error) => {
