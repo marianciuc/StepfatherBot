@@ -5,9 +5,12 @@ const express = require('express');
 const app = express();
 const {prefix, token} = require("./config.json");
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const servers = require('./servers.json');
 const date = new Date();
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const telegram = require("./modules/Telegram");
+const log = require('./modules/log');
+const mysql = require("mysql2");
+const server = require("./modules/server");
+const database = require("./modules/DataBase");
 
 const minute = 1000 * 60;
 const hour = minute * 60;
@@ -20,6 +23,7 @@ app.get('/', function (request, response) {
 }).listen(app.get('port'), function () {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
+
 
 //Getting commands
 bot.commands = new Discord.Collection();
@@ -39,7 +43,23 @@ bot.commands = new Discord.Collection();
 //Bot login
 bot.login(token).then(() => console.log("Login successful"));
 
-bot.once("ready", () => {
+const connection = mysql.createConnection({
+    host: "45.80.71.154",
+    user: "rootstep",
+    database: "stepfather_discord_bot",
+    password: "Vovik1596@"
+});
+connection.connect(function(err){
+    if (err) {
+        return log.log(bot,"Ошибка: " + err.message);
+    }
+    else{
+        console.log("Подключение к серверу MySQL успешно установлено");
+    }
+});
+
+bot.once("ready", async () => {
+
     let count = 0;
     for (let guild of bot.guilds.cache) {
         guild.map(guild => {
@@ -48,19 +68,24 @@ bot.once("ready", () => {
             }
         });
     }
-    bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
+    await bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
+
     if (prefix != '?') {
         for (let channel of bot.channels.cache) {
-            channel.map(channel => {
+            channel.map(async channel => {
                 if (channel && channel != null && channel.type == "voice") {
-                    if (servers[channel.guild.id] && servers[channel.guild.id].channelId && servers[channel.guild.id].categoriesId && servers[channel.guild.id].categoriesId == channel.parent.id) {
-                        if (channel.id != servers[channel.guild.id].channelId) {
+
+                    let Server = await database.QueryInit(bot, channel.guild.id);
+
+                    if (Server != null && Server.private_channel_id != null && Server.private_category_id != null && channel.parent.id && Server.private_category_id == channel.parent.id) {
+
+                        if (channel.id != Server.private_channel_id) {
                             let count = 0;
                             channel.members.map(member => {
                                 count++;
                             })
                             if (count == 0) {
-                                channel.delete("All users leave.").catch(err => log(err.message));
+                                channel.delete("All users leave.").catch(err => log.log(bot,err.message));
                             } else {
                                 let delInt = setInterval(() => {
                                     let count = 0;
@@ -69,7 +94,7 @@ bot.once("ready", () => {
                                             count++;
                                         });
                                         if (count == 0) {
-                                            channel.delete("All users leave.").catch(err => log(err.message));
+                                            channel.delete("All users leave.").catch(err => log.log(bot,err.message));
                                             clearInterval(delInt);
                                         }
                                     }
@@ -79,47 +104,51 @@ bot.once("ready", () => {
                     }
                 }
             });
-        }
-        log(`${bot.user.username} has started`);
-        bot.generateInvite(["ADMINISTRATOR"]).then((link) => {
-            log(link);
-        }).catch(error => log(error));
+         }
+        log.log(bot,`${bot.user.username} has started`);
     }
 });
 
 
 //message listener
 bot.on("message", async (message) => {
-    if (!message.guild && !message.author.bot){
-        let embedElement = new Discord.MessageEmbed()
-            .setColor(0xffd63e)
-            .setAuthor(`${bot.user.username}`)
-            .setDescription("To use the bot, just write `!Help` to the chat of your guild." +
-                "\nJoin our guild [here](https://discord.gg/mUnUzWt).\n"+
-                "To connect the bot to your guild, follow the [link](https://discordapp.com/oauth2/authorize?client_id=700113613825769522&scope=bot&permissions=2146958839)")
-            .setImage(`${"https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif"}`)
-            .setTimestamp();
-        message.author.send(embedElement);
-        return;
+    if (!message.guild && !message.author.bot) return;
+
+    if (message.author.bot || message.content.substr(0, 1) !== '!') return;
+
+    if (message.channel.id == 722474604530106458 && prefix != '?') return;
+
+    //Create object server from database
+        let Server = await database.QueryInit(bot, message.guild.id);
+        if (Server == null) {
+            if (!message.author.bot) {
+                if (message.content == `!configure`) {
+                    bot.commands.get('configure').execute(message, bot);
+                    await message.reply(`Guild has been configured.`);
+                    return;
+                }
+                await message.reply("Type '!configure' for configure your guild and fix this message.");
+                return;
+            }
+            return 0;
     }
-    let newPrefix = prefix;
-    if (message.guild && servers[message.guild.id].prefix) {
-        newPrefix = servers[message.guild.id].prefix;
-    }
-    if (!message.guild && message.author.bot && !message.content.startsWith(newPrefix)) return;
-    const args = message.content.toLowerCase().slice(newPrefix.length).split(/ +/);
-    if (message.content.substr(0, newPrefix.length) != newPrefix) return;
+    if (!message.guild && message.author.bot && !message.content.startsWith(Server.prefix)) return;
+
+    const args = message.content.toLowerCase().slice(Server.prefix.length).split(/ +/);
+
+    if (message.content.substr(0, Server.prefix.length) !== Server.prefix) return;
+
     const command = args.shift();
 
     switch (command) {
         case "help":
-            bot.commands.get('help-menu').execute(message, newPrefix);
+            bot.commands.get('help-menu').execute(message, Server.prefix);
             return 0;
         case "purge":
             bot.commands.get('clear-chat').execute(message);
             return 0;
         case "embed":
-            bot.commands.get('embeddedMessage').execute(message);
+            bot.commands.get('embeddedMessage').execute(message, Server.prefix);
             return 0;
         case "avatar":
             bot.commands.get('get-user-image').execute(message);
@@ -131,39 +160,39 @@ bot.on("message", async (message) => {
             bot.commands.get('coin-flip').execute(message);
             return 0;
         case "bug":
-            bot.commands.get('bug').execute(message, newPrefix, bot);
+            bot.commands.get('bug').execute(message, Server.prefix, bot);
             return 0;
         case "yn":
-            bot.commands.get('yon').execute(message, newPrefix);
+            bot.commands.get('yon').execute(message, Server.prefix);
             return 0;
         case "getserverlist":
             bot.commands.get('get-server-list').execute(message, bot);
             return 0;
         case "sug":
-            bot.commands.get('suggestions').execute(message, newPrefix, bot);
+            bot.commands.get('suggestions').execute(message, Server.prefix, bot);
             return 0;
         case "connect":
-            bot.commands.get('private-help').execute(message, newPrefix);
+            bot.commands.get('private-help').execute(message, Server.prefix);
             return 0;
         case "private":
             switch (args[0]) {
                 case "add":
-                    bot.commands.get('add-private-room').execute(args, message);
+                    bot.commands.get('add-private-room').execute(args, message, bot);
                     return 0;
                 case "limit":
-                    bot.commands.get('change-limit-for-private-rooms').execute(args, message);
+                    bot.commands.get('change-limit-for-private-rooms').execute(args, message, bot);
                     return 0;
             }
         case "manage":
             switch (args[0]) {
                 case "help":
-                    bot.commands.get('manage-help').execute(message);
+                    bot.commands.get('manage-help').execute(message, bot);
                     return 0;
                 case "prefix":
-                    bot.commands.get('change-prefix').execute(message, args);
+                    bot.commands.get('change-prefix').execute(message, args, bot);
                     return 0;
                 case "welcome":
-                    bot.commands.get('add-welcome').execute(message, args);
+                    bot.commands.get('add-welcome').execute(message, args, bot);
                     return 0;
             }
             return 0;
@@ -184,30 +213,31 @@ let intervalStatus = setInterval(() => {
             });
         }
         bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
-        log(`Changed status to ${count} members`);
     } else if (sq > 50) {
         bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
-        log(`Changed status to ${bot.guilds.cache.size} servers`);
     }
 
 }, hour / 2);
 
 //Closeness function
-bot.on("voiceStateUpdate", (oldState, newState) => {
-    if (prefix == '?') return;
+bot.on("voiceStateUpdate", async (oldState, newState) => {
+    if (prefix == '?'){return;}
     if (!oldState.channel) {//checking VoiceState status
 
         let guildId = newState.channel.guild.id; //Getting guild id
 
-        if (servers[guildId] || servers[guildId].channelId == newState.channel.parent.id) {
-            if (servers[guildId].channelId == newState.channel.id) { //cloning channel
+        let Server = await database.QueryInit(bot, guildId);
+        if (Server == null) return;
+
+        if (Server.private_channel_id != null && newState.channel.parent.id && Server.private_category_id == newState.channel.parent.id) {
+            if (Server.private_channel_id == newState.channel.id) { //cloning channel
                 newState.channel.clone({
                     name: newState.member.user.username + " 🔓",
                     reason: 'Closeness function activated.',
-                    userLimit: servers[newState.channel.guild.id].limit
+                    userLimit: Server.private_channel_limit
                 }).then(clone => {
                     newState.setChannel(clone, "Closeness function activated.").catch(error => {
-                        console.error(error)
+                        log.log(bot,error.message)
                     });
                     clone.overwritePermissions([
                         {
@@ -217,14 +247,14 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
                     ], 'Needed to change permissions');
                     let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
-                            clone.delete("All users leave.").catch(err => console.error(err.message));
+                            clone.delete("All users leave.").catch(err => log.log(bot,err.message));
                             clearInterval(interval);
                             return;
                         }
                         if (!clone.full) {
-                            clone.setName(newState.member.user.username + " 🔓").catch(err => console.error(err.message));
+                            clone.setName(newState.member.user.username + " 🔓").catch(err => log.log(bot,err.message));
                         } else if (clone.full) {
-                            clone.setName(newState.member.user.username + " 🔐").catch(err => console.error(err.message));
+                            clone.setName(newState.member.user.username + " 🔐").catch(err => log.log(bot,err.message));
                         }
                     }, 5000);
                 })
@@ -236,18 +266,26 @@ bot.on("voiceStateUpdate", (oldState, newState) => {
 
 
 //Member add
-bot.on('guildMemberAdd', member => {
-    if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
-        bot.channels.fetch(`${servers[member.guild.id].welcome_channel}}`).then(channel => {
+bot.on('guildMemberAdd', async member => {
+
+    let Server = await database.QueryInit(bot, member.guild.id);
+    if (Server == null) return;
+
+    if (Server.welcome_channel_id != null) {
+        bot.channels.fetch(`${Server.welcome_channel_id}`).then(channel => {
             channel.send(`Hello, ***${member.user.tag}***`);
         });
     }
 });
 
 //Member out
-bot.on("guildMemberRemove", member => {
-    if (servers[member.guild.id] && servers[member.guild.id].welcome_channel) {
-        bot.channels.fetch(`${servers[member.guild.id].welcome_channel}}`).then(channel => {
+bot.on("guildMemberRemove", async member => {
+
+    let Server = await database.QueryInit(bot, member.guild.id);
+    if (Server == null) return;
+
+    if (Server.welcome_channel_id != null) {
+        bot.channels.fetch(`${Server.welcome_channel_id}`).then(channel => {
             channel.send(`***${member.user.tag}*** has been leaved from the server`);
         });
     }
@@ -255,18 +293,14 @@ bot.on("guildMemberRemove", member => {
 
 //Listener for bot add to the server
 bot.on("guildCreate", guild => {
-    sendToTelegram(`${guild.name} add bot to server.\n ${guild.memberCount} members`);
+    telegram.sendToTelegram(bot,`${guild.name} add bot to server.\n ${guild.memberCount} members`);
+
     bot.user.setActivity(`!help`, {type: 'LISTENING'});
-    servers[guild.id] = {
-        categoriesId: undefined,
-        channelId: undefined,
-        limit: 2,
-        prefix: prefix,
-        welcome_channel: undefined
-    }
-    fs.writeFile("servers.json", JSON.stringify(config), (error) => {
-        if (error) console.log(error.message)
-    });
+
+    let Server = new server(guild.id, null, null, "!", null,
+        null, null, 2);
+    database.addToDataBase(bot, Server);
+
     bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
@@ -284,15 +318,17 @@ bot.on("guildCreate", guild => {
                     inline: false
                 },
             );
-        channel.send(embed).catch(err => console.error(err));
+        channel.send(embed).catch(err => log.log(bot,err.message));
     });
 });
 
 //Bot removed from the server
 bot.on("guildDelete", guild => {
 
+    database.removeFromDataBase(guild, guild.id);
+
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
-    sendToTelegram(`${guild.name} remove bot from server.`);
+    telegram.sendToTelegram(bot,`${guild.name} remove bot from server.`);
     bot.channels.fetch("722474553372180641").then(channel => {
         let embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
@@ -310,28 +346,14 @@ bot.on("guildDelete", guild => {
                     inline: false
                 },
             );
-        channel.send(embed).catch(err => console.error(err));
+        channel.send(embed).catch(err => log.log(bot,err.message));
     });
 });
 
 
 //bot log
-
-let log = (text) => {
-    bot.channels.fetch(`722474315886362735`).then(channel => {
-        channel.send(`${text}`);
-    });
-    sendToTelegram(text);
-}
-
 bot.on("error", (error) => {
-    log(`${error}`);
-    sendToTelegram(error);
+    log.log(bot,`${error}`);
 });
-function sendToTelegram(message) {
-    const token = `1202079323:AAG4e9PiTHQpoI2OzACs6isGVVkKLIqBoH0`;
-    let url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=-1001373973545&text=`
-    let xhttp = new XMLHttpRequest();
-    xhttp.open("get", url + message, true);
-    xhttp.send();
-}
+
+//

@@ -1,10 +1,9 @@
 const Discord = require(`discord.js`);
-const prefix = require("../package.json");
 
 module.exports = {
     name: "embeddedMessage",
     description: "Embedded your message( embed <message content>)",
-    execute(message){
+    execute(message, prefix){
         let url = undefined;
         message.attachments.map(attachment => {
             url = attachment.url;

@@ -1,9 +1,9 @@
-const fs = require("fs");
-let serverJson = require("../servers.json");
+const database = require("../modules/DataBase.js");
+
 module.exports = {
     name: "add-private-room",
     description: "private add <category id> <channel id>",
-    async execute(args, message) {
+    async execute(args, message, bot) {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");
             return 0;
@@ -13,17 +13,10 @@ module.exports = {
             message.channel.send("Channel or category not founded");
             return 0;
         }
-        let guildId = message.guild.id;
-            serverJson[guildId] = {
-                categoriesId: args[1],
-                channelId: args[2],
-                limit: 2,
-                prefix: serverJson[guildId].prefix,
-                welcome_channel: serverJson[guildId].welcome_channel
-            }
-            fs.writeFile("servers.json", JSON.stringify(serverJson), (error) => {
-                if (error) console.log(error.message)
-            });
+
+        database.updateGuild(bot, "private_category_id", args[1], message.guild.id);
+        database.updateGuild(bot, "private_channel_id", args[2], message.guild.id);
+
         message.channel.send(`**Private room successful added**\n***New private channel name***: ${message.guild.channels.cache.get(args[2]).name}\n`+
             `***Category name:*** ${message.guild.channels.cache.get(args[1])}`);
     }

@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
+
 module.exports = {
     name: "get-user-image",
-    descriptiom: "menu",
+    description: "menu list",
     execute(message){
         if (!message.mentions.users.size){
             return;
@@ -12,7 +13,7 @@ module.exports = {
                 .setColor(0xffd63e)
                 .setImage(`${user.avatarURL()}`)
         });
-        for (users in avatarList){
-            message.channel.send(avatarList[users]);
+        for (let user in avatarList){
+            message.channel.send(avatarList[user]);
         }
     }}
