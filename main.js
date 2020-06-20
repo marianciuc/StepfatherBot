@@ -112,15 +112,12 @@ bot.once("ready", async () => {
 
 //message listener
 bot.on("message", async (message) => {
-    if (!message.guild && !message.author.bot) return;
-
-    if (message.author.bot || message.content.substr(0, 1) !== '!') return;
-
-    if (message.channel.id == 722474604530106458 && prefix != '?') return;
+    if (!message.guild && !message.author.bot || message.channel.id == 722474604530106458 && prefix != '?' || message.author.bot) return;
 
     //Create object server from database
         let Server = await database.QueryInit(bot, message.guild.id);
         if (Server == null) {
+            if (message.author.bot || message.content.substr(0, 1) !== '!') return;
             if (!message.author.bot) {
                 if (message.content == `!configure`) {
                     bot.commands.get('configure').execute(message, bot);
