@@ -32,7 +32,6 @@ function Query(bot, id) {
 QueryInit = async function (bot, id) {
     let promise = await Query(bot, id);
     if (promise.length < 1){
-        log.log(bot, "Error: Promise is empty.");
         return null;
     }
     let serverObj = new Server(promise[0].guild_id, promise[0].private_category_id, promise[0].private_channel_id, promise[0].prefix,
