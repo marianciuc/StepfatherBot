@@ -1,5 +1,5 @@
 module.exports = class Server {
-    constructor(guild_id, private_category_id, private_channel_id, prefix, welcome_channel_id, telegram_channel_id, log_channel_id, private_channel_limit) {
+    constructor(guild_id, private_category_id, private_channel_id, prefix, welcome_channel_id, telegram_channel_id, log_channel_id, private_channel_limit, custom_welcome_image_url) {
         this._guild_id = guild_id;
         this._private_category_id = private_category_id;
         this._private_channel_id = private_channel_id;
@@ -8,7 +8,17 @@ module.exports = class Server {
         this._telegram_channel_id = telegram_channel_id;
         this._log_channel_id = log_channel_id;
         this._private_channel_limit = private_channel_limit;
+        this._custom_welcome_image_url = custom_welcome_image_url;
     }
+
+    get custom_welcome_image_url() {
+        return this._custom_welcome_image_url;
+    }
+
+    set custom_welcome_image_url(value) {
+        this._custom_welcome_image_url = value;
+    }
+
     get guild_id() {
         return this._guild_id;
     }

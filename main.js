@@ -20,7 +20,7 @@ const hour = minute * 60;
 //Activate app
 app.set('port', (process.env.PORT || 5000));
 app.get('/', function (request, response) {
-    let result = 'Bot is running'
+    const result = 'Bot is running'
     response.send(result);
 }).listen(app.get('port'), function () {
     console.log('App is running, server is listening on port ', app.get('port'));
@@ -30,9 +30,9 @@ app.get('/', function (request, response) {
 //Getting commands
 bot.commands = new Discord.Collection();
 !function () {
-    for (let file of commandFiles) {
+    for (const file of commandFiles) {
         try {
-            let command = require(`./src/commands/${file}`);
+            const command = require(`./src/commands/${file}`);
             bot.commands.set(command.name, command);
             console.log(`Added ${command.name}, ${command.description}`)
         } catch (error) {
@@ -63,7 +63,7 @@ connection.connect(function(err){
 bot.once("ready", async () => {
 
     let count = 0;
-    for (let guild of bot.guilds.cache) {
+    for (const guild of bot.guilds.cache) {
         guild.map(guild => {
             if (guild.memberCount) {
                 count += guild.memberCount;
@@ -73,7 +73,7 @@ bot.once("ready", async () => {
     await bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 
     if (prefix !== '?') {
-        for (let channel of bot.channels.cache) {
+        for (const channel of bot.channels.cache) {
             channel.map(async channel => {
                 if (channel && channel != null && channel.type === "voice") {
 
@@ -89,7 +89,7 @@ bot.once("ready", async () => {
                             if (count == 0) {
                                 channel.delete("All users leave.").catch(err => debug.log(bot,err.message));
                             } else {
-                                let delInt = setInterval(() => {
+                                const delInt = setInterval(() => {
                                     let count = 0;
                                     if (channel) {
                                         channel.members.map(member => {
@@ -139,8 +139,11 @@ bot.on("message", async (message) => {
     const command = args.shift();//delete prefix form args
 
     switch (command) {
+        case "csgo":
+            bot.commands.get('GetRank').getCsGoRank(message, Server.prefix);
+            return 0;
         case "help":
-            bot.commands.get('help-menu').execute(message, Server.prefix);
+            bot.commands.get('help-menu').getMainHelp(message, Server.prefix);
             return 0;
         case "purge":
             bot.commands.get('clear-chat').execute(message);
@@ -152,19 +155,16 @@ bot.on("message", async (message) => {
             bot.commands.get('get-user-image').execute(message);
             return 0;
         case "rand":
-            bot.commands.get('random').execute(message.content, message);
+            bot.commands.get('random').getRandomValue(message.content, message);
             return 0;
         case "flip":
-            bot.commands.get('coin-flip').execute(message);
+            bot.commands.get('random').flip(message);
             return 0;
         case "bug":
             bot.commands.get('service').execute(message, Server.prefix, bot, "bug");
             return 0;
         case "yn":
-            bot.commands.get('yon').execute(message, Server.prefix);
-            return 0;
-        case "welcome":
-           canvas.getWelcomeImage(message);
+            bot.commands.get('random').getYesOrNot(message, Server.prefix);
             return 0;
         case "gsl": //get servers list
             bot.commands.get('bot-info').getServersList(message, bot);
@@ -173,28 +173,39 @@ bot.on("message", async (message) => {
             bot.commands.get('suggestions').execute(message, Server.prefix, bot, "sug");
             return 0;
         case "connect":
-            bot.commands.get('private-help').execute(message, Server.prefix);
+            bot.commands.get('help-menu').getPrivateHelp(message, Server.prefix);
             return 0;
         case "private":
             switch (args[0]) {
                 case "add":
-                    bot.commands.get('add-private-room').execute(args, message, bot);
+                    await bot.commands.get('private').addPrivateRoom(args, message, bot);
                     return 0;
                 case "limit":
-                    bot.commands.get('change-limit-for-private-rooms').execute(args, message, bot);
+                    bot.commands.get('private').changeLimit(args, message, bot);
                     return 0;
             }
         case "manage":
             switch (args[0]) {
                 case "help":
-                    bot.commands.get('manage-help').execute(message, bot);
+                    bot.commands.get('help-menu').getManageHelp(message, Server.prefix);
                     return 0;
                 case "prefix":
                     bot.commands.get('change-prefix').execute(message, args, bot);
                     return 0;
                 case "welcome":
-                    bot.commands.get('add-welcome').execute(message, args, bot);
-                    return 0;
+                    switch (args[1]){
+                        case "add":
+                            await bot.commands.get('welcome').changeWelcomeImage(message, args, bot);
+                            return 0;
+                        case "image":
+                            bot.commands.get('welcome').changeWelcomeChannelImage(message, bot, args[2]);
+                            return 0;
+                        case "help":
+                            bot.commands.get('help-menu').getWelcomeList(message);
+                            return 0;
+                    }
+                default:
+                    await message.reply(`Use \`${Server.prefix}manage help\` to get help list`);
             }
             return 0;
         case "status":
@@ -203,10 +214,10 @@ bot.on("message", async (message) => {
 });
 
 let intervalStatus = setInterval(() => {
-    let sq = Math.floor(Math.random() * 100);
+    const sq = Math.floor(Math.random() * 100);
     if (sq < 50) {
         let count = 0;
-        for (let guild of bot.guilds.cache) {
+        for (const guild of bot.guilds.cache) {
             guild.map(guild => {
                 if (guild.memberCount) {
                     count += guild.memberCount;
@@ -225,9 +236,9 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
     if (prefix == '?'){return;}
     if (!oldState.channel) {//checking VoiceState status
 
-        let guildId = newState.channel.guild.id; //Getting guild id
+        const guildId = newState.channel.guild.id; //Getting guild id
 
-        let Server = await database.QueryInit(bot, guildId);
+        const Server = await database.QueryInit(bot, guildId);
         if (Server == null) return;
 
         if (Server.private_channel_id != null && newState.channel.parent.id && Server.private_category_id == newState.channel.parent.id) {
@@ -247,7 +258,7 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
                         },
                     ], 'Needed to change permissions');
                     let interval = setInterval(() => {
-                        if (clone.members.size < 1 || !clone) {
+                        if (!clone || clone.members.size < 1) {
                             clone.delete("All users leave.").catch(err => debug.log(bot,err.message));
                             clearInterval(interval);
                             return;
@@ -273,37 +284,74 @@ bot.on('guildMemberAdd', async member => {
     if (Server == null) return;
 
     if (Server.welcome_channel_id != null) {
-        bot.channels.fetch(`${Server.welcome_channel_id}`).then(channel => {
-            channel.send(`Hello, ***${member.user.tag}***`);
-        });
+        await canvas.getWelcomeImage(member, bot, "add");
     }
 });
 
 //Member out
 bot.on("guildMemberRemove", async member => {
 
-    let Server = await database.QueryInit(bot, member.guild.id);
+    const Server = await database.QueryInit(bot, member.guild.id);
     if (Server == null) return;
 
     if (Server.welcome_channel_id != null) {
-        bot.channels.fetch(`${Server.welcome_channel_id}`).then(channel => {
-            channel.send(`***${member.user.tag}*** has been leaved from the server`);
-        });
+        await canvas.getWelcomeImage(member, bot, "remove");
     }
 });
 
 //Listener for bot add to the server
-bot.on("guildCreate", guild => {
+bot.on("guildCreate",  guild => {
     telegram.sendToTelegram(bot,`${guild.name} add bot to server.\n ${guild.memberCount} members`);
 
     bot.user.setActivity(`!help`, {type: 'LISTENING'});
 
-    let Server = new server(guild.id, null, null, "!", null,
+    const message = new Discord.MessageEmbed()
+        .setDescription(`To connect the bot to your server and use private chat function write:` + "```c\n" + prefix + "connect```")
+        .setAuthor("🤖 Stepfather Help list",)
+        .setColor(0xffd63e)
+        .addFields(
+            {
+                name: '\u200B', value: "\n" +
+                    "Get a list of guild administration help (configure the welcome channel, change the bot prefix for the server, and much more)" +
+                    "\n```js\n" + prefix + "manage help```", inline: false
+            },
+            {name: '\u200B', value: "Send bug report ```" + prefix + "bug <report text>```", inline: true},
+            {
+                name: '\u200B',
+                value: "Send suggestions message ```" + prefix + "sug <suggestions message>```",
+                inline: true
+            },
+            {name: '\u200B', value: "Show a list of commands ```" + prefix + "help```", inline: true},
+            {name: '\u200B', value: "Yes or Not ```" + prefix + "yn <question>```", inline: true},
+            {name: '\u200B', value: "Get bot info ```" + prefix + "status```", inline: true},
+            {name: '\u200B', value: "🐬 Flip a coin ```" + prefix + "flip```", inline: true},
+            {name: '\u200B', value: "Private help list ```" + prefix + "connect```", inline: true},
+            {name: '\u200B', value: "Delete last n messages ```" + prefix + "purge <n>```", inline: true},
+            {
+                name: '\u200B',
+                value: "Get embedded message ```" + prefix + "embed <message content>```",
+                inline: true
+            },
+            {
+                name: '\u200B',
+                value: "Get user image ```" + prefix + "avatar <@user>``` or ```" + prefix + "avarar <@user> <@user>```",
+                inline: true
+            },
+            {
+                name: '\u200B',
+                value: "Generates a random number from 0 to the value you entered\n```js\n" + prefix + "random 20``````js\n@author, Value from 0 to 20 - 11```",
+                inline: true
+            },
+        );
+
+    guild.owner.send(message);
+
+    const Server = new server(guild.id, null, null, "!", null,
         null, null, 2);
     database.addToDataBase(bot, Server);
 
     bot.channels.fetch("722474553372180641").then(channel => {
-        let embed = new Discord.MessageEmbed()
+        const embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Added to server.")
             .setColor(0xffd63e)
@@ -331,7 +379,7 @@ bot.on("guildDelete", guild => {
     bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
     telegram.sendToTelegram(bot,`${guild.name} remove bot from server.`);
     bot.channels.fetch("722474553372180641").then(channel => {
-        let embed = new Discord.MessageEmbed()
+        const embed = new Discord.MessageEmbed()
             .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
             .setTitle("Removed from server.")
             .setColor(0xffd63e)
@@ -356,5 +404,3 @@ bot.on("guildDelete", guild => {
 bot.on("error", (error) => {
     debug.log(bot,`${error}`);
 });
-
-//
