@@ -195,7 +195,7 @@ bot.on("message", async (message) => {
                 case "welcome":
                     switch (args[1]){
                         case "add":
-                            await bot.commands.get('welcome').changeWelcomeImage(message, args, bot);
+                            await bot.commands.get('welcome').changeWelcomeImage(message, args[2], bot);
                             return 0;
                         case "image":
                             bot.commands.get('welcome').changeWelcomeChannelImage(message, bot, args[2]);
