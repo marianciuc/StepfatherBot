@@ -1,6 +1,6 @@
-const database = require("../modules/DataBase.js");
-const log = require("../modules/Log.js");
-let server = require("../modules/Server.js");
+const database = require("../DataAccessObjects/ServersImplementation.js");
+const log = require("../Debug.js");
+let server = require("../Models/Server.js");
 
 module.exports = {
     name: "configure",

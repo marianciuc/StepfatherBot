@@ -1,4 +1,4 @@
-const database = require("../modules/DataBase.js");
+const database = require("../DataAccessObjects/ServersImplementation.js");
 
 module.exports = {
     name: "add-welcome",

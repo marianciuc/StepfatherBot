@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const database = require('../modules/DataBase.js');
+const database = require('../DataAccessObjects/ServersImplementation.js');
 
 module.exports = {
     name: "manage-help",

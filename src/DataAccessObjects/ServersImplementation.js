@@ -1,7 +1,7 @@
-const Server = require("./server.js");
+const Server = require("../Models/Server.js");
 const mysql = require("mysql2");
-const log = require('./log.js');
-const properties = require('../databse.json');
+const debug = require('../Debug.js');
+const properties = require('../../databse.json');
 
 
 const mysqlConfig = {
@@ -15,13 +15,13 @@ const mysqlConfig = {
 const Connections = mysql.createPool(mysqlConfig);
 
 function Query(bot, id) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
 
         Connections.query("SELECT * FROM guilds WHERE guild_id = ?",id, processOutput);
 
         function processOutput(err, results, fields) {
             if (err){
-                log.log(bot, err);
+                debug.log(bot, err);
                 return null;}
 
             return resolve(results, fields);
@@ -48,7 +48,7 @@ function addToDataBase(bot, Server) {
     let data = [Server.guild_id, Server.private_category_id, Server.private_channel_id, Server.prefix, Server.welcome_channel_id, Server.telegram_channel_id,
         Server.log_channel_id, Server.private_channel_limit];
     Connections.query(sql, data, function(err) {
-        if(err) log.log(bot, err);
+        if(err) debug.log(bot, err);
     });
 }
 
@@ -59,7 +59,7 @@ function removeFromDataBase(bot, guild_id) {
     let sql = "DELETE FROM guilds WHERE guild_id=?";
     let data = [guild_id];
     Connections.query(sql, data, function(err) {
-        if(err) log.log(bot,err);
+        if(err) debug.log(bot,err);
     });
 }
 
@@ -70,7 +70,7 @@ function updateGuild(bot, type, param, id) {
     let sql = `UPDATE guilds SET ${type}=? WHERE guild_id=?`;
     let data = [param, id];
     Connections.query(sql, data, function(err, results) {
-        if(err) log.log(bot, err);
+        if(err) debug.log(bot, err);
     });
 }
 module.exports.updateGuild = updateGuild;

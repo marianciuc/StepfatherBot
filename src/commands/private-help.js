@@ -1,4 +1,7 @@
 const Discord = require("discord.js");
+
+
+
 module.exports = {
     name: "private-help",
     description: "private help menu",

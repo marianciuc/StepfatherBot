@@ -1,16 +1,18 @@
-const Discord = require("discord.js");
-const bot = new Discord.Client();
-const fs = require("fs");
-const express = require('express');
-const app = express();
+const Discord       = require("discord.js");
+const canvas        = require("./src/commands/GetWelcomeCanvas");
+const database      = require("./src/DataAccessObjects/ServersImplementation");
+const databaseJson  = require("./databse.json");
+const debug         = require('./src/Debug');
+const express       = require('express');
+const fs            = require("fs");
+const mysql         = require("mysql2");
+const server        = require("./src/Models/Server");
+const telegram      = require("./src/Telegram");
 const {prefix, token} = require("./config.json");
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const date = new Date();
-const telegram = require("./modules/Telegram");
-const log = require('./modules/log');
-const mysql = require("mysql2");
-const server = require("./modules/server");
-const database = require("./modules/DataBase");
+
+const app           = express();
+const bot           = new Discord.Client();
+const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
 const minute = 1000 * 60;
 const hour = minute * 60;
@@ -30,9 +32,9 @@ bot.commands = new Discord.Collection();
 !function () {
     for (let file of commandFiles) {
         try {
-            let command = require(`./commands/${file}`);
+            let command = require(`./src/commands/${file}`);
             bot.commands.set(command.name, command);
-            console.log(`Added ${command.name}.`)
+            console.log(`Added ${command.name}, ${command.description}`)
         } catch (error) {
             console.error(error.message);
         }
@@ -44,17 +46,17 @@ bot.commands = new Discord.Collection();
 bot.login(token).then(() => console.log("Login successful"));
 
 const connection = mysql.createConnection({
-    host: "45.80.71.154",
-    user: "rootstep",
-    database: "stepfather_discord_bot",
-    password: "Vovik1596@"
+    host: databaseJson.host,
+    user: databaseJson.user,
+    database: databaseJson.database,
+    password: databaseJson.password
 });
 connection.connect(function(err){
     if (err) {
-        return log.log(bot,"Ошибка: " + err.message);
+        return debug.log(bot,"Ошибка: " + err.message);
     }
     else{
-        console.log("Подключение к серверу MySQL успешно установлено");
+        console.log("Successfully connected to database.");
     }
 });
 
@@ -70,12 +72,12 @@ bot.once("ready", async () => {
     }
     await bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
 
-    if (prefix != '?') {
+    if (prefix !== '?') {
         for (let channel of bot.channels.cache) {
             channel.map(async channel => {
-                if (channel && channel != null && channel.type == "voice") {
+                if (channel && channel != null && channel.type === "voice") {
 
-                    let Server = await database.QueryInit(bot, channel.guild.id);
+                    const Server = await database.QueryInit(bot, channel.guild.id);
 
                     if (Server != null && Server.private_channel_id != null && Server.private_category_id != null && channel.parent.id && Server.private_category_id == channel.parent.id) {
 
@@ -85,7 +87,7 @@ bot.once("ready", async () => {
                                 count++;
                             })
                             if (count == 0) {
-                                channel.delete("All users leave.").catch(err => log.log(bot,err.message));
+                                channel.delete("All users leave.").catch(err => debug.log(bot,err.message));
                             } else {
                                 let delInt = setInterval(() => {
                                     let count = 0;
@@ -94,7 +96,7 @@ bot.once("ready", async () => {
                                             count++;
                                         });
                                         if (count == 0) {
-                                            channel.delete("All users leave.").catch(err => log.log(bot,err.message));
+                                            channel.delete("All users leave.").catch(err => debug.log(bot,err.message));
                                             clearInterval(delInt);
                                         }
                                     }
@@ -105,7 +107,7 @@ bot.once("ready", async () => {
                 }
             });
          }
-        log.log(bot,`${bot.user.username} has started`);
+        debug.log(bot,`${bot.user.username} has started`);
     }
 });
 
@@ -115,8 +117,9 @@ bot.on("message", async (message) => {
     if (!message.guild && !message.author.bot || message.channel.id == 722474604530106458 && prefix != '?' || message.author.bot) return;
 
     //Create object server from database
-        let Server = await database.QueryInit(bot, message.guild.id);
-        if (Server == null) {
+        const Server = await database.QueryInit(bot, message.guild.id);//function return null if guild not registered on database
+
+        if (Server == null) {//checking for presence
             if (message.author.bot || message.content.substr(0, 1) !== '!') return;
             if (!message.author.bot) {
                 if (message.content == `!configure`) {
@@ -129,13 +132,11 @@ bot.on("message", async (message) => {
             }
             return 0;
     }
-    if (!message.guild && message.author.bot && !message.content.startsWith(Server.prefix)) return;
+    if (!message.guild || message.author.bot || !message.content.startsWith(Server.prefix)) return;
 
-    const args = message.content.toLowerCase().slice(Server.prefix.length).split(/ +/);
+    const args = message.content.toLowerCase().slice(Server.prefix.length).split(/ +/);//regex
 
-    if (message.content.substr(0, Server.prefix.length) !== Server.prefix) return;
-
-    const command = args.shift();
+    const command = args.shift();//delete prefix form args
 
     switch (command) {
         case "help":
@@ -157,16 +158,19 @@ bot.on("message", async (message) => {
             bot.commands.get('coin-flip').execute(message);
             return 0;
         case "bug":
-            bot.commands.get('bug').execute(message, Server.prefix, bot);
+            bot.commands.get('service').execute(message, Server.prefix, bot, "bug");
             return 0;
         case "yn":
             bot.commands.get('yon').execute(message, Server.prefix);
             return 0;
-        case "getserverlist":
-            bot.commands.get('get-server-list').execute(message, bot);
+        case "welcome":
+           canvas.getWelcomeImage(message);
+            return 0;
+        case "gsl": //get servers list
+            bot.commands.get('bot-info').getServersList(message, bot);
             return 0;
         case "sug":
-            bot.commands.get('suggestions').execute(message, Server.prefix, bot);
+            bot.commands.get('suggestions').execute(message, Server.prefix, bot, "sug");
             return 0;
         case "connect":
             bot.commands.get('private-help').execute(message, Server.prefix);
@@ -194,7 +198,7 @@ bot.on("message", async (message) => {
             }
             return 0;
         case "status":
-            bot.commands.get('bot-info').execute(message, bot);
+            bot.commands.get('bot-info').getOsInfo(message, bot);
     }
 });
 
@@ -209,9 +213,9 @@ let intervalStatus = setInterval(() => {
                 }
             });
         }
-        bot.user.setActivity(`${count} members`, {type: 'LISTENING'});
+        bot.user.setActivity(`${count} members`, {type: 'LISTENING'}).then(r => console.log("changed"));
     } else if (sq > 50) {
-        bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
+        bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'}).then(r => console.log("changed"));;
     }
 
 }, hour / 2);
@@ -234,7 +238,7 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
                     userLimit: Server.private_channel_limit
                 }).then(clone => {
                     newState.setChannel(clone, "Closeness function activated.").catch(error => {
-                        log.log(bot,error.message)
+                        debug.log(bot,error.message)
                     });
                     clone.overwritePermissions([
                         {
@@ -244,14 +248,14 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
                     ], 'Needed to change permissions');
                     let interval = setInterval(() => {
                         if (clone.members.size < 1 || !clone) {
-                            clone.delete("All users leave.").catch(err => log.log(bot,err.message));
+                            clone.delete("All users leave.").catch(err => debug.log(bot,err.message));
                             clearInterval(interval);
                             return;
                         }
                         if (!clone.full) {
-                            clone.setName(newState.member.user.username + " 🔓").catch(err => log.log(bot,err.message));
+                            clone.setName(newState.member.user.username + " 🔓").catch(err => debug.log(bot,err.message));
                         } else if (clone.full) {
-                            clone.setName(newState.member.user.username + " 🔐").catch(err => log.log(bot,err.message));
+                            clone.setName(newState.member.user.username + " 🔐").catch(err => debug.log(bot,err.message));
                         }
                     }, 5000);
                 })
@@ -315,7 +319,7 @@ bot.on("guildCreate", guild => {
                     inline: false
                 },
             );
-        channel.send(embed).catch(err => log.log(bot,err.message));
+        channel.send(embed).catch(err => debug.log(bot,err.message));
     });
 });
 
@@ -343,14 +347,14 @@ bot.on("guildDelete", guild => {
                     inline: false
                 },
             );
-        channel.send(embed).catch(err => log.log(bot,err.message));
+        channel.send(embed).catch(err => debug.log(bot,err.message));
     });
 });
 
 
-//bot log
+//bot debug
 bot.on("error", (error) => {
-    log.log(bot,`${error}`);
+    debug.log(bot,`${error}`);
 });
 
 //

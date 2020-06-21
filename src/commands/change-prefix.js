@@ -1,4 +1,4 @@
-let Database = require("../modules/DataBase.js");
+let Database = require("../DataAccessObjects/ServersImplementation.js");
 
 module.exports = {
     name: "change-prefix",
