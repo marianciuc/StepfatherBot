@@ -138,6 +138,8 @@ bot.on("message", async (message) => {
 
     const command = args.shift();//delete prefix form args
 
+    console.log(args);
+
     switch (command) {
         case "csgo":
             bot.commands.get('GetRank').getCsGoRank(message, Server.prefix);
@@ -195,13 +197,13 @@ bot.on("message", async (message) => {
                 case "welcome":
                     switch (args[1]){
                         case "add":
-                            await bot.commands.get('welcome').changeWelcomeImage(message, args[2], bot);
+                            await bot.commands.get('add-welcome').execute(message, args[2], bot);
                             return 0;
                         case "image":
                             bot.commands.get('welcome').changeWelcomeChannelImage(message, bot, args[2]);
                             return 0;
                         case "help":
-                            bot.commands.get('help-menu').getWelcomeList(message);
+                            await bot.commands.get('help-menu').getWelcomeList(message);
                             return 0;
                     }
                 default:
