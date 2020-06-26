@@ -8,7 +8,6 @@ const express       = require('express');
 const fs            = require("fs");
 const mysql         = require("mysql2");
 const server        = require("./src/Models/Server");
-const session       = require('express-session');
 const telegram      = require("./src/Telegram");
 const {prefix, token} = require("./config.json");
 
