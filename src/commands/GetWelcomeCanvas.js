@@ -4,63 +4,98 @@ const {MessageAttachment} = require('discord.js');
 const Database = require('../DataAccessObjects/ServersImplementation');
 const Debug = require('../Debug');
 const image = require('../../welcome_image.json');
+const {registerFont} = require('canvas');
 
-const width = 1200;
-const height = 600;
+const width = 831;
+const height = 407;
 
 const canvas = createCanvas(width, height);
 const context = canvas.getContext('2d');
 
+
+//Imports fonts
+//registerFont(PATH, fontFace);
+registerFont('./src/OtherRes/fonts/19572.ttf', {family: 'Lemon'});
+
 module.exports = {
     name: 'welcome',
-    changeWelcomeChannelImage(message, bot, url){
+
+    //Change welcome image function
+    //<param message = {member, channel, guild}>
+    //<param bot = client> discord bot client
+    changeWelcomeChannelImage(message, bot, url) {
+
+        //Checking for user has permissions
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");
             return 0;
         }
 
+        //connecting to database and update guild information
         Database.updateGuild(bot, "custom_welcome_image_url", url, message.guild.id);
         message.reply(`Successfully changed welcome image.\n`);
     },
-    async changeWelcomeImage(message, args, bot){
+
+    //change welcome channel id function
+    //<param message = {member, channel, guild}>
+    //<param bot = client> discord bot client
+    //<param id = new channel id>
+    changeWelcomeChannel(message, id, bot) {
+
+        //Checking for user has permissions
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");
             return 0;
         }
 
-        if (args.length < 2) return;
-        if (!message.guild.channels.cache.get(args[1])){
+        //checking for channel available
+        if (!message.guild.channels.cache.get(id)) {
             message.channel.send("Channel not founded");
             return 0;
         }
 
-        database.updateGuild(bot, "welcome_channel_id", args[1], message.guild.id);
+        //connecting to database and update welcome_channel_id information
+        Database.updateGuild(bot, "welcome_channel_id", id, message.guild.id);
 
-        message.channel.send(`***New welcome channel name***: ${message.guild.channels.cache.get(args[1])}`);
+        message.channel.send(`***New welcome channel name***: ${message.guild.channels.cache.get(id)}`);
     }
 }
+
+//Get welcome image function
+// <param member = user> set user
+// <param bot = client> discord bot client
+// <param type = type {sug or bug}> getting message type
 
 module.exports.getWelcomeImage = getWelcomeImage;
 
 async function getWelcomeImage(member, bot, type) {
+
+    //Creating server model and getting guild info from database
     const server = await Database.QueryInit(bot, member.guild.id);
     const welcome_channel_id = server.welcome_channel_id;
 
+    //text
     let text;
+    let statusText;
+    let third;
 
-    if (type === "add"){
-        text = `Welcome to ${member.guild.name}\n${member.user.tag}`;
+    if (type === "add") {
+        statusText = `WELCOME`;
+        text = `${member.user.tag}`;
+        third = `to ${member.guild.name}`;
     } else {
-        text = `${member.user.tag}\nHas been removed from ${member.guild.name}`;
+        statusText = `GOODBYE`;
+        text = `${member.user.tag}`;
     }
 
+    //Checking for custom welcome image
     if (server != null && server.custom_welcome_image_url != null && server.custom_welcome_image_url.endsWith(".png")) {
         await loadImage(`${server.custom_welcome_image_url}`).then(image => {
-            context.drawImage(image, 0, 0, 1200, 600);
+            context.drawImage(image, 0, 0, width, height);
         });
     } else {
-        await loadImage('./src/Images/welcome_images/welcome_image-1.png').then(image => {
-            context.drawImage(image, 0, 0, 1200, 600);
+        await loadImage('./src/Images/welcome_images/welcome_image.png').then(image => {
+            context.drawImage(image, 0, 0, width, height);
         });
     }
 
@@ -68,20 +103,38 @@ async function getWelcomeImage(member, bot, type) {
     context.textBaseline = 'top';
 
     context.fillStyle = '#fff';
-    context.font = '30pt Roboto';
 
-    await loadImage(`${member.user.avatarURL({format: "png"})}`).then(image => {
-        context.drawImage(image, 83, 126, 340, 340);
-        context.fillText(text, 750, 240, 1100);
+    await loadImage(`${member.user.avatarURL({format: "png"})}`).then(async image => {
+        context.drawImage(image, 298, 17, 237, 237);
+
+        //Draw welcome or goodbye
+        context.font = '40pt Lemon';
+
+        context.fillText(statusText, 416, 271);
+
+        //Draw other text
+        context.font = '20pt Century Gothic';
+
+        context.fillText(text, 416, 327);
+
+        if (third) context.fillText(third, 416, 352);
+
+        //save image
         const buffer = canvas.toBuffer('image/png');
-        fs.writeFileSync('./src/Images/welcome_images/welcome_image.png', buffer);
+        await fs.writeFileSync(`./src/Images/welcome_images/welcome_image_${member.user.id}.png`, buffer);
     });
 
     await setTimeout(async () => {
-        const attachment = await new MessageAttachment('./src/Images/welcome_images/welcome_image.png');
+        //init attachment
+        const attachment = await new MessageAttachment(`./src/Images/welcome_images/welcome_image_${member.user.id}.png`);
+
+        //searching welcome channel
         bot.channels.fetch(welcome_channel_id).then(async channel => {
-            console.log(channel);
-            channel.send(attachment);
+            //sending image
+            await channel.send(attachment);
+
+            //deleting image from server
+            await fs.unlinkSync(`./src/Images/welcome_images/welcome_image_${member.user.id}.png`);
         });
-    }, 1000);
+    }, 2000);
 }

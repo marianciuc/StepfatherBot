@@ -33,6 +33,6 @@ module.exports = {
                 .setTimestamp();
             channel.send(embed).catch(err => log.log(bot, err));
         });
-        message.reply("Bug message sent successfully"); //reply to author
+        message.reply(type === "bug" ? "Bug message sent successfully" : "Suggestions message sent successfully"); //reply to author
     }
 }

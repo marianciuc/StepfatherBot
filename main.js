@@ -1,4 +1,5 @@
 const Discord       = require("discord.js");
+const bodyParser    = require('body-parser')
 const canvas        = require("./src/commands/GetWelcomeCanvas");
 const database      = require("./src/DataAccessObjects/ServersImplementation");
 const databaseJson  = require("./databse.json");
@@ -6,16 +7,23 @@ const debug         = require('./src/Debug');
 const express       = require('express');
 const fs            = require("fs");
 const mysql         = require("mysql2");
+const passport      = require('passport');
 const server        = require("./src/Models/Server");
+const session       = require('express-session');
 const telegram      = require("./src/Telegram");
 const {prefix, token} = require("./config.json");
 
+const RedisStore    = require('connect-redis')(session);
 const app           = express();
 const bot           = new Discord.Client();
 const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+require('dotenv').config({path:'./src/app/.env'});
+const env = require('dotenv').config();
 
 const minute = 1000 * 60;
 const hour = minute * 60;
+
+NODE_ENV = 'development'
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
@@ -25,7 +33,6 @@ app.get('/', function (request, response) {
 }).listen(app.get('port'), function () {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
-
 
 //Getting commands
 bot.commands = new Discord.Collection();
@@ -141,49 +148,63 @@ bot.on("message", async (message) => {
     console.log(args);
 
     switch (command) {
-        case "csgo":
-            bot.commands.get('GetRank').getCsGoRank(message, Server.prefix);
-            return 0;
+            //Getting main help menu +
         case "help":
             bot.commands.get('help-menu').getMainHelp(message, Server.prefix);
             return 0;
+            //Clear chat function +
         case "purge":
             bot.commands.get('clear-chat').execute(message);
             return 0;
+            //Embedded chat function +
         case "embed":
             bot.commands.get('embeddedMessage').execute(message, Server.prefix);
             return 0;
+            //Get users avatars +
         case "avatar":
             bot.commands.get('get-user-image').execute(message);
             return 0;
+            //Get rand value +
         case "rand":
             bot.commands.get('random').getRandomValue(message.content, message);
             return 0;
+            //Get head or tails +
         case "flip":
             bot.commands.get('random').flip(message);
             return 0;
+            //Send report +
         case "bug":
             bot.commands.get('service').execute(message, Server.prefix, bot, "bug");
             return 0;
+            //Get yes or not +
         case "yn":
             bot.commands.get('random').getYesOrNot(message, Server.prefix);
             return 0;
-        case "gsl": //get servers list
+            //Get servers list +
+        case "gsl":
             bot.commands.get('bot-info').getServersList(message, bot);
             return 0;
+            //Send sug message +
         case "sug":
-            bot.commands.get('suggestions').execute(message, Server.prefix, bot, "sug");
+            bot.commands.get('service').execute(message, Server.prefix, bot, "sug");
             return 0;
+            //Get private help +
         case "connect":
             bot.commands.get('help-menu').getPrivateHelp(message, Server.prefix);
             return 0;
+            //Private menu switch +
         case "private":
             switch (args[0]) {
+                    //Add private channel
                 case "add":
                     await bot.commands.get('private').addPrivateRoom(args, message, bot);
                     return 0;
+                    //Change private limit +
                 case "limit":
                     bot.commands.get('private').changeLimit(args, message, bot);
+                    return 0;
+                default:
+                    await message.reply(`Use \`${Server.prefix}connect\` to get private help list`);
                     return 0;
             }
         case "manage":
@@ -197,7 +218,7 @@ bot.on("message", async (message) => {
                 case "welcome":
                     switch (args[1]){
                         case "add":
-                            await bot.commands.get('add-welcome').execute(message, args[2], bot);
+                            await bot.commands.get('welcome').changeWelcomeChannel(message, args[2], bot);
                             return 0;
                         case "image":
                             bot.commands.get('welcome').changeWelcomeChannelImage(message, bot, args[2]);
@@ -208,6 +229,7 @@ bot.on("message", async (message) => {
                     }
                 default:
                     await message.reply(`Use \`${Server.prefix}manage help\` to get help list`);
+                    return 0;
             }
             return 0;
         case "status":

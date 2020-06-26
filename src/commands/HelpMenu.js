@@ -4,7 +4,7 @@ const {MessageAttachment} = require('discord.js');
 
 module.exports = {
     name: "help-menu",
-    description: "menu",
+    description: "main menu",
     getMainHelp(message, prefix) {
         const embed = new Discord.MessageEmbed()
             .setDescription(`To connect the bot to your server and use private chat function write:` + "```c\n" + prefix + "connect```")
@@ -55,10 +55,11 @@ module.exports = {
                 {
                     name: '\u200B',
                     value: 'Add or replace current private channel' +
-                        '```js\n'+prefix+'private add <id category> <id channel>```'
+                        '```js\n' + prefix + 'private add <id category> <id channel>```'
                 }, {
                     name: '\u200B',
-                    value: 'Change user limit```js\n'+prefix+'private limit <new user limit>```' },
+                    value: 'Change user limit```js\n' + prefix + 'private limit <new user limit>```'
+                },
             )
             .setImage("https://s7.gifyu.com/images/Record_2020_06_02_13_24_25_654.gif")
             .setTimestamp();
@@ -79,11 +80,13 @@ module.exports = {
             .addFields(
                 {
                     name: '\u200B', value: 'Set or change welcome channel' +
-                        '```js\n' + prefix + 'manage welcome <id channel>```'
-                },
-                {
+                        '```js\n' + prefix + 'manage welcome add <id channel>```'
+                },{
+                    name: '\u200B', value: 'Set or change welcome image' +
+                        '```js\n' + prefix + 'manage welcome image <image_url.png>```'
+                },{
                     name: '\u200B',
-                    value: 'Change user limit```js\n' + prefix + 'private limit <new user limit>```'
+                    value: 'Get welcome channel default images and change image information```js\n' + prefix + 'manage welcome help```'
                 },
             )
             .setImage("https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif")

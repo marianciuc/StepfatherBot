@@ -1,4 +1,4 @@
-const telegram = require('./Telegram');
+const telegram = require('./Telegram.js');
 
 module.exports.log = function(bot, message){
     bot.channels.fetch(`722474315886362735`).then(channel => {
