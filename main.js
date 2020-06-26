@@ -7,13 +7,11 @@ const debug         = require('./src/Debug');
 const express       = require('express');
 const fs            = require("fs");
 const mysql         = require("mysql2");
-const passport      = require('passport');
 const server        = require("./src/Models/Server");
 const session       = require('express-session');
 const telegram      = require("./src/Telegram");
 const {prefix, token} = require("./config.json");
 
-const RedisStore    = require('connect-redis')(session);
 const app           = express();
 const bot           = new Discord.Client();
 const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
