@@ -115,9 +115,9 @@ async function getWelcomeImage(member, bot, type) {
         //Draw other text
         context.font = '20pt Century Gothic';
 
-        context.fillText(text, 416, 327);
+        context.fillText(text, 416, 332);
 
-        if (third) context.fillText(third, 416, 352);
+        if (third) context.fillText(third, 416, 357);
 
         //save image
         const buffer = canvas.toBuffer('image/png');
