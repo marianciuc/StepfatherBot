@@ -14,13 +14,9 @@ const {prefix, token} = require("./config.json");
 const app           = express();
 const bot           = new Discord.Client();
 const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-require('dotenv').config({path:'./src/app/.env'});
-const env = require('dotenv').config();
 
 const minute = 1000 * 60;
 const hour = minute * 60;
-
-NODE_ENV = 'development'
 
 //Activate app
 app.set('port', (process.env.PORT || 5000));
