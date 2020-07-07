@@ -20,9 +20,12 @@ registerFont('./src/OtherRes/fonts/19572.ttf', {family: 'Lemon'});
 module.exports = {
     name: 'welcome',
 
-    //Change welcome image function
-    //<param message = {member, channel, guild}>
-    //<param bot = client> discord bot client
+    /**
+     * @param message
+     * @param bot (Discord bot client)
+     * @param url (New image url)
+     * @returns {number} (If message author hasPermissions == false)
+     */
     changeWelcomeChannelImage(message, bot, url) {
 
         //Checking for user has permissions
@@ -36,10 +39,12 @@ module.exports = {
         message.reply(`Successfully changed welcome image.\n`);
     },
 
-    //change welcome channel id function
-    //<param message = {member, channel, guild}>
-    //<param bot = client> discord bot client
-    //<param id = new channel id>
+    /**
+     * @param message
+     * @param id (Welcome channel id)
+     * @param bot (Discord bot client)
+     * @returns {number}
+     */
     changeWelcomeChannel(message, id, bot) {
 
         //Checking for user has permissions
@@ -61,13 +66,15 @@ module.exports = {
     }
 }
 
-//Get welcome image function
-// <param member = user> set user
-// <param bot = client> discord bot client
-// <param type = type {sug or bug}> getting message type
-
 module.exports.getWelcomeImage = getWelcomeImage;
 
+/**
+ * Get welcome image function
+ * @param member
+ * @param bot (Discord bot client)
+ * @param type
+ * @returns {Promise<void>}
+ */
 async function getWelcomeImage(member, bot, type) {
 
     //Creating server model and getting guild info from database

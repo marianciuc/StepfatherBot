@@ -9,6 +9,7 @@ const fs            = require("fs");
 const mysql         = require("mysql2");
 const server        = require("./src/Models/Server");
 const telegram      = require("./src/Telegram");
+const Guild         = require("./src/commands/Guild.js");
 const {prefix, token} = require("./config.json");
 
 const app           = express();
@@ -27,7 +28,10 @@ app.get('/', function (request, response) {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
 
-//Getting commands
+/**
+ * Getting commands from ./src/commands/...
+ * @type {module:"discord.js".Collection<K, V>}
+ */
 bot.commands = new Discord.Collection();
 !function () {
     for (const file of commandFiles) {
@@ -42,9 +46,15 @@ bot.commands = new Discord.Collection();
     console.log(`Added ${bot.commands.size} files.`)
 }();
 
-//Bot login
+/**
+ * Discord client authentication with token.
+ */
 bot.login(token).then(() => console.log("Login successful"));
 
+/**
+ * Checking for database connection.
+ * @type {Connection}
+ */
 const connection = mysql.createConnection({
     host: databaseJson.host,
     user: databaseJson.user,
@@ -60,9 +70,17 @@ connection.connect(function(err){
     }
 });
 
+/**
+ * Where bot has been started we call for this function.
+ *
+ * This function:
+ * Counting guilds and members, change bot activity, checking for private channels available,
+ * if private channel is available, function create interval @delInt {CONST delInt}.
+ */
 bot.once("ready", async () => {
 
     let count = 0;
+
     for (const guild of bot.guilds.cache) {
         guild.map(guild => {
             if (guild.memberCount) {
@@ -112,9 +130,24 @@ bot.once("ready", async () => {
 });
 
 
-//message listener
+/**
+ * Message event listener
+ */
 bot.on("message", async (message) => {
-    if (!message.guild && !message.author.bot || message.channel.id == 722474604530106458 && prefix != '?' || message.author.bot) return;
+    if (!message.guild && !message.author.bot){
+        const privateMessage = await new Discord.MessageEmbed()
+            .setAuthor(bot.user.username)
+            .setDescription("To use the bot, just write `!Help` to the chat of your guild.\n" +
+                "Join our guild [here](https://discord.gg/mUnUzWt).\n" +
+                "To connect the bot to your guild, follow the [link](https://discordapp.com/oauth2/authorize?client_id=700113613825769522&scope=bot&permissions=2146958839)")
+            .setColor(0xffd63e)
+            .setImage("https://s7.gifyu.com/images/rainbow9550eeae6fd8fd5f.gif")
+            .setTimestamp();
+        await message.author.send(privateMessage);
+        return 0;
+    }
+
+    if (message.channel.id == 722474604530106458 && prefix != '?' || message.author.bot) return;
 
     //Create object server from database
         const Server = await database.QueryInit(bot, message.guild.id);//function return null if guild not registered on database
@@ -148,6 +181,12 @@ bot.on("message", async (message) => {
             //Clear chat function +
         case "purge":
             bot.commands.get('clear-chat').execute(message);
+            return 0;
+        case "guild":
+            await Guild.getGuildInfo(bot, message, true, 's');
+            return 0;
+        case "gid":
+            await Guild.getGuildInfoById(bot, args[0], message);
             return 0;
             //Embedded chat function +
         case "embed":
@@ -248,10 +287,12 @@ let intervalStatus = setInterval(() => {
 
 }, hour / 2);
 
-//Closeness function
+/**
+ * Closeness function
+ */
 bot.on("voiceStateUpdate", async (oldState, newState) => {
-    if (prefix == '?'){return;}
-    if (!oldState.channel) {//checking VoiceState status
+    if (prefix != '?'){
+    if (!oldState.channel || newState && newState.channel) {//checking VoiceState status
 
         const guildId = newState.channel.guild.id; //Getting guild id
 
@@ -291,6 +332,7 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
             }
         }
     }
+    }
 });
 
 
@@ -305,7 +347,9 @@ bot.on('guildMemberAdd', async member => {
     }
 });
 
-//Member out
+/**
+ * Member out
+ */
 bot.on("guildMemberRemove", async member => {
 
     const Server = await database.QueryInit(bot, member.guild.id);
@@ -369,17 +413,19 @@ bot.on("guildCreate",  guild => {
 
     bot.channels.fetch("722474553372180641").then(channel => {
         const embed = new Discord.MessageEmbed()
-            .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
+            .setAuthor(`${guild.name}`, "https://media1.tenor.com/images/83cdd1dd40cdb87020949e0f075b9648/tenor.gif?itemid=11230336")
             .setTitle("Added to server.")
             .setColor(0xffd63e)
+            .setThumbnail(guild.iconURL())
             .addFields(
                 {
-                    name: 'Basic',
-                    value: `**Server name:** ${guild.name}(${guild.id})\n`
+                    name: 'Basic:',
+                    value: `**Server name:** ${guild.name}\n`
+                        + `**Server id:** ${guild.id}\n`
                         + `**Server owner:** ${guild.owner.user.tag}`,
                     inline: true
                 }, {
-                    name: 'Other',
+                    name: 'Other:',
                     value: `**Members: **${guild.memberCount}`,
                     inline: false
                 },
@@ -390,20 +436,23 @@ bot.on("guildCreate",  guild => {
 
 //Bot removed from the server
 bot.on("guildDelete", guild => {
-
     database.removeFromDataBase(guild, guild.id);
 
-    bot.user.setActivity(`Serving ${bot.guilds.cache.size} servers`);
+    bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'});
     telegram.sendToTelegram(bot,`${guild.name} remove bot from server.`);
+
+    //Fetching channels where id == "722474553372180641"
     bot.channels.fetch("722474553372180641").then(channel => {
         const embed = new Discord.MessageEmbed()
-            .setAuthor(`**${guild.name}**`, `https://i.ibb.co/RQt9WNH/add-server-logo-512x512.png`)
+            .setAuthor(`${guild.name}`, "https://media1.tenor.com/images/83cdd1dd40cdb87020949e0f075b9648/tenor.gif?itemid=11230336")
             .setTitle("Removed from server.")
             .setColor(0xffd63e)
+            .setThumbnail(guild.iconURL())
             .addFields(
                 {
                     name: 'Basic',
-                    value: `**Server name:** ${guild.name}(${guild.id})\n`
+                    value: `**Server name:** ${guild.name}\n`
+                        + `**Server id:** ${guild.id}\n`
                         + `**Server owner:** ${guild.owner.user.tag}`,
                     inline: true
                 }, {
@@ -421,3 +470,8 @@ bot.on("guildDelete", guild => {
 bot.on("error", (error) => {
     debug.log(bot,`${error}`);
 });
+
+
+bot.on("channelUpdate", (channel) =>{
+    console.log(channel);
+})
