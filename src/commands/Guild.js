@@ -20,6 +20,10 @@ async function getGuildInfo(bot, message, status, g){
             customEmojisString = `${customEmojisString} ${emoji.toString()}`
         });
 
+        if (customEmojisString.length > 500){
+            customEmojisString = "Too many emojis";
+        }
+
         let rolesString = "";
 
         guild.roles.cache.forEach(role => {
@@ -70,11 +74,11 @@ async function getGuildInfo(bot, message, status, g){
             } else if (channel.type === "category"){
                 categories++;
             }
-            if (!privateChannel && channel.id === server.private_channel_id){
+            if (privateChannel && channel.id === server.private_channel_id){
                 privateChannel = channel;
-            } else if (!welcomeChannel && channel.id === server.welcome_channel_id){
+            } else if (welcomeChannel && channel.id === server.welcome_channel_id){
                 welcomeChannel = channel;
-            } else if (!privateChannelCategory && channel.id === server.private_category_id){
+            } else if (privateChannelCategory && channel.id === server.private_category_id){
                 privateChannelCategory = channel;
             }
         })
@@ -91,6 +95,7 @@ async function getGuildInfo(bot, message, status, g){
                     `**Welcome channel:** ${welcomeChannel ? welcomeChannel.name : "None"}`+
                     `\n**Welcome image:** ${server.custom_welcome_image_url ? server.custom_welcome_image_url : "None"}`, inline: false},
                 {name: `Emojis: ${guild.emojis.cache.size}`, value: `**All emojis:**\n${customEmojisString}`, inline: false},
+                {name: `Roles: ${roleArgs.length-1}`, value: `**All roles:** ${rolesString}\n**Highest role:** ${highestRole}`, inline: false},
                 {name: "Support bot:", value: `\n**[Donate link 1](https://www.donationalerts.com/r/stepfather) [Donate link 2](https://donatebot.io/checkout/700110963176636578)**`, inline: false},
                 )
             .setFooter(`${owner.user.username}`, `${owner.user.displayAvatarURL()}`)
