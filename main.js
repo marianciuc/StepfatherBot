@@ -470,8 +470,3 @@ bot.on("guildDelete", guild => {
 bot.on("error", (error) => {
     debug.log(bot,`${error}`);
 });
-
-
-bot.on("channelUpdate", (channel) =>{
-    console.log(channel);
-})
