@@ -110,5 +110,9 @@ async function getGuildInfo(bot, message, status, g){
                 return;
             }
         });
+        if (!guild){
+            message.send("Guild not founded");
+            return 0;
+        }
         await getGuildInfo(bot, message, false, guild);
     }
