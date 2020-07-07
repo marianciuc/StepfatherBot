@@ -58,9 +58,9 @@ async function getGuildInfo(bot, message, status, g){
         });
 
         const users = members - bots;
-        let privateChannel;
-        let privateChannelCategory;
-        let welcomeChannel;
+        let privateChannel = server.private_channel_id;
+        let privateChannelCategory = server.private_category_id;
+        let welcomeChannel = server.welcome_channel_id;
         const channels = guild.channels.cache.size;
         let voiceChannels = 0;
         let textChannels = 0;
@@ -111,7 +111,7 @@ async function getGuildInfo(bot, message, status, g){
             }
         });
         if (!guild){
-            message.send("Guild not founded");
+            message.channel.send("Guild not founded");
             return 0;
         }
         await getGuildInfo(bot, message, false, guild);
