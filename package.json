@@ -23,12 +23,10 @@
     "broadcast-channel": "^3.1.0",
     "canvas": "^2.6.1",
     "connect-redis": "^4.0.4",
-    "csgo": "^1.5.14",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "ffmpeg-static": "^4.1.1",
-    "globaloffensive": "^2.1.0",
     "moment": "^2.26.0",
     "mongodb": "^3.1.0",
     "mysql": "^2.18.1",
@@ -46,7 +44,7 @@
     "node": "14.x"
   },
   "devDependencies": {
-    "express-session": "^1.17.1",
-    "steam-user": "^4.16.2"
+    "eslint": "^7.7.0",
+    "express-session": "^1.17.1"
   }
 }

@@ -19,14 +19,18 @@ const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsW
 const minute = 1000 * 60;
 const hour = minute * 60;
 
+let arrayApiTest = [];
+
+
 //Activate app
-app.set('port', (process.env.PORT || 5000));
-app.get('/', function (request, response) {
-    const result = 'Bot is running'
-    response.send(result);
-}).listen(app.get('port'), function () {
-    console.log('App is running, server is listening on port ', app.get('port'));
-});
+// app.set('port', (process.env.PORT || 5000));
+// app.post('/name', function (request, response) {
+//     app.post('/name', ((request, response) => (arrayApiTest.push(request.body))));
+//     response.json(request.body);
+//
+// }).listen(app.get('port'), function () {
+//     console.log('App is running, server is listening on port ', app.get('port'));
+// });
 
 /**
  * Getting commands from ./src/commands/...
@@ -282,7 +286,7 @@ let intervalStatus = setInterval(() => {
         }
         bot.user.setActivity(`${count} members`, {type: 'LISTENING'}).then(r => console.log("changed"));
     } else if (sq > 50) {
-        bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'}).then(r => console.log("changed"));;
+        bot.user.setActivity(`${bot.guilds.cache.size} servers`, {type: 'LISTENING'}).then(r => console.log("changed"));
     }
 
 }, hour / 2);
@@ -336,9 +340,10 @@ bot.on("voiceStateUpdate", async (oldState, newState) => {
 });
 
 
-//Member add
+/**
+ * Member added
+ */
 bot.on('guildMemberAdd', async member => {
-
     let Server = await database.QueryInit(bot, member.guild.id);
     if (Server == null) return;
 
@@ -351,7 +356,6 @@ bot.on('guildMemberAdd', async member => {
  * Member out
  */
 bot.on("guildMemberRemove", async member => {
-
     const Server = await database.QueryInit(bot, member.guild.id);
     if (Server == null) return;
 
@@ -434,7 +438,10 @@ bot.on("guildCreate",  guild => {
     });
 });
 
-//Bot removed from the server
+/**
+ * Bot removed from the server event
+ */
+
 bot.on("guildDelete", guild => {
     database.removeFromDataBase(guild, guild.id);
 
@@ -465,8 +472,8 @@ bot.on("guildDelete", guild => {
     });
 });
 
-
-//bot debug
-bot.on("error", (error) => {
-    debug.log(bot,`${error}`);
-});
+/**
+ TODO fix some bugs [ empty id`s in database, - ]
+ TODO realise welcome role system
+ TODO realise webPage with admin panel
+ **/
