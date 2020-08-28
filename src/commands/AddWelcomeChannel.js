@@ -4,11 +4,6 @@ module.exports = {
     name: "add-welcome",
     description: "<tag> welcome <channel id>",
     execute(message, channelId, bot){
-
-        console.log(" sda "+channelId);
-
-        console.log(" sda "+channelId);
-
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");
             return 0;

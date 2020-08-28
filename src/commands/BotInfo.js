@@ -3,9 +3,9 @@ const os = require('os')
 
 
 module.exports = {
-    name: "bot-info",
+    name: "status",
     description: "Display bot info",
-    getOsInfo(message, bot) {
+    execute(message, prefix, bot) {
 
         let countUsers = 0;
         let countCategory = 0;
@@ -57,16 +57,5 @@ module.exports = {
                 `\n**[Donate link 1](https://www.donationalerts.com/r/stepfather) [Donate link 2](https://donatebot.io/checkout/700110963176636578)**`)
             .setTimestamp();
         message.channel.send(embedElement);
-    },
-    getServersList(message, bot) {
-        let count = " ";
-        for (const guild of bot.guilds.cache) {
-            guild.map(guild => {
-                if (guild.name) {
-                    count = count + "\n" + guild.name + "(" + guild.id + "): " + guild.memberCount + " members";
-                }
-            });
-        }
-        message.channel.send(count);
     }
 }

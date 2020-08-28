@@ -1,7 +1,7 @@
 const Discord = require(`discord.js`);
 
 module.exports = {
-    name: "embeddedMessage",
+    name: "embed",
     description: "Embedded your message( embed <message content>)",
     execute(message, prefix){
         let url = undefined;
