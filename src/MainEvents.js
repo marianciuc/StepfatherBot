@@ -140,7 +140,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
             if (time.date === timeString){
                 for (const channel of bot.channels.cache){
                     channel.map(c => {
-                        if (c && c.type === "text" && c.id == "722474604530106458"){
+                        if (c && c.type === "text" && c.id == "745372352648315033"){
                             c.send(time.text);
                         }
                     })
