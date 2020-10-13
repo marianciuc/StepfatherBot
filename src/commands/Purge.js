@@ -11,7 +11,7 @@ module.exports = {
             );
         }
 
-        if (!msg.member.hasPermission("ADMINISTRATOR") && message.author.id !== "295862909714825217") {
+        if (message.author.id !== "295862909714825217" || !msg.member.hasPermission("ADMINISTRATOR")) {
             msg.channel.send("❌ You are not administrator");
             return 0;
         }
