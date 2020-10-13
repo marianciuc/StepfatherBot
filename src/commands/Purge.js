@@ -5,13 +5,13 @@ module.exports = {
     execute(msg) {
         let amount = parseInt(msg.content.replace(/\D+/g, ""));
 
-        if (isNaN(amount) || !amount || amount <= 2 || amount > 99) {
+        if (isNaN(amount) || !amount || amount < 2 || amount > 99) {
             return msg.reply(
                 `❌ Please provide a number between 2 and 100 for the number of messages to delete`
             );
         }
 
-        if (message.author.id !== "295862909714825217" || !msg.member.hasPermission("ADMINISTRATOR")) {
+        if (msg.author.id !== "295862909714825217" || !msg.member.hasPermission("ADMINISTRATOR")) {
             msg.channel.send("❌ You are not administrator");
             return 0;
         }
