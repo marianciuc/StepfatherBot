@@ -137,7 +137,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
         const date = new Date();
         const timeString = date.getHours() + ":" + date.getMinutes();
         for (const time of timeArray){
-            //if (time.date === timeString){
+            if (time.date === timeString){
                 for (const channel of bot.channels.cache){
                     channel.map(c => {
                         if (c && c.type === "text" && c.id == "745374719045271603"){
@@ -145,7 +145,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
                         }
                     })
                 }
-            //}
+            }
         }
     }, 1000);
     /**
