@@ -139,13 +139,15 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
         for (const time of timeArray){
             if (time.date === timeString){
                 for (const channel of bot.channels.cache){
-                    if (channel.id === "745372352648315033"){
-                        channel.send(time.text);
-                    }
+                    channel.map(c => {
+                        if (c && c.type === "text" && c.id == "722474604530106458"){
+                            c.send(time.text);
+                        }
+                    })
                 }
             }
         }
-    }, 60000);
+    }, 1000);
     /**
      * Bot added to the server event
      */
