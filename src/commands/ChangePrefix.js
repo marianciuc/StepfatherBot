@@ -2,7 +2,7 @@ let Database = require("../DataAccessObjects/ServersImplementation.js");
 
 module.exports = {
     name: "change-prefix",
-    description: "<prefix> manage prefix <new prefix>",
+    visibility: false,
     execute(message, args, bot){
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {

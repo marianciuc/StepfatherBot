@@ -1,6 +1,7 @@
 module.exports = {
     name: "purge",
-    description: "Clearing chat",
+    description: "Removes chat messages with a maximum limit of one hundred emails and a maximum of two weeks.",
+    visibility: true,
     execute(msg) {
         let amount = parseInt(msg.content.replace(/\D+/g, ""));
 

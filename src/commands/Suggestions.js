@@ -3,7 +3,8 @@ const log = require(`../Debug`);
 
 module.exports = {
     name: "sug",
-    description: "Sending suggestion to discord channel",
+    description: "Send your idea to us in a discord and telegram.",
+    visibility: true,
     execute(message, prefix, bot) {
         let url;
         const args = message.content.toLowerCase().slice(prefix.length).split(/ +/);

@@ -2,7 +2,8 @@ const Discord = require(`discord.js`);
 
 module.exports = {
     name: "embed",
-    description: "Embedded your message( embed <message content>)",
+    description: "Send your message using the Embeded function.",
+    visibility: true,
     execute(message, prefix){
         let url = undefined;
         message.attachments.map(attachment => {

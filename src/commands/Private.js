@@ -3,6 +3,7 @@ const database = require("../DataAccessObjects/ServersImplementation.js");
 module.exports = {
     name: "private",
     description: "private add <category id> <channel id>",
+    visibility: false,
     async addPrivateRoom(args, message, bot) {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");

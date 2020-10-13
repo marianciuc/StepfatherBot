@@ -2,7 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: "help",
-    description: "main menu",
+    description: "Call the bot help menu.",
+    visibility: true,
     execute(message, prefix) {
         const embed = new Discord.MessageEmbed()
             .setDescription(`To connect the bot to your server and use private chat function write:` + "```c\n" + prefix + "connect```")

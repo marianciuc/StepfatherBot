@@ -2,7 +2,6 @@ const server        = require("../src/Models/Server");
 const telegram      = require("../src/Telegram");
 const debug         = require('../src/Debug');
 const canvas        = require("../src/commands/GetWelcomeCanvas");
-const PropTypes     = require('prop-types');
 
 const minute = 1000 * 60;
 const hour = minute * 60;
@@ -29,7 +28,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
     /**
      * Discord client authentication with token.
      */
-    bot.login(process.env.DISCORD_TOKEN).then(() => console.log(`Login successful\nName: ${bot.user.username}`));
+    bot.login(process.env.DISCORD_TOKEN || "NzAwMTEzNjEzODI1NzY5NTIy.XupUdw.dqzVytTZ1sosYcH8o5pAb6KboKM").then(() => console.log(`Login successful\nName: ${bot.user.username}`));
 
     /**
      * Where bot has been started we call for this function.
@@ -121,6 +120,33 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
         ;
     });
 
+    const timeInterval = setInterval(() => {
+        const timeArray = [
+                            {date: "21:50", image: "", text: `Уважаемые киберпроститутки!!! Через 10 минут начинаеться смена!!! Всем занять позиции!!!`},
+                            {date: "23:10", image: "", text: `Загадка жака Фреско через 20 минут в 23:30`},
+                            {date: "23:40", image: "", text: `Загадка жака Фреско через 20 минут в 0:10`},
+                            {date: "0:30", image: "", text: `Загадка жака Фреско через 20 минут в 0:50`},
+                            {date: "1:10", image: "", text: `Загадка жака Фреско через 20 минут в 1:30`},
+                            {date: "1:50", image: "", text: `Загадка жака Фреско через 20 минут в 2:10`},
+                            {date: "2:30", image: "", text: `Загадка жака Фреско через 20 минут в 2:50`},
+                            {date: "3:10", image: "", text: `Загадка жака Фреско через 20 минут в 3:30`},
+                            {date: "4:30", image: "", text: `Загадка жака Фреско через 20 минут в 4:50`},
+                            {date: "5:10", image: "", text: `Загадка жака Фреско через 20 минут в 5:30`},
+                            {date: "5:50", image: "", text: `Загадка жака Фреско через 20 минут в 6:10`},
+                            {date: "6:30", image: "", text: `Загадка жака Фреско через 20 минут в 6:50`},
+                            ];
+        const date = new Date();
+        const timeString = date.getHours() + ":" + date.getMinutes();
+        for (const time of timeArray){
+            if (time.date === timeString){
+                for (const channel of bot.channels.cache){
+                    if (channel.id === "745372352648315033"){
+                        channel.send(time.text);
+                    }
+                }
+            }
+        }
+    }, 60000);
     /**
      * Bot added to the server event
      */

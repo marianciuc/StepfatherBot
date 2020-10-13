@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: "rand",
+    description: "The function of generating pseudo-random numbers from zero to 9-digit numbers.",
+    visibility: true,
     execute(message){
         const maxValue = parseInt(message.content.replace(/\D+/g, ""));
 

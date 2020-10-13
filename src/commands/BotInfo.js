@@ -4,7 +4,8 @@ const os = require('os')
 
 module.exports = {
     name: "status",
-    description: "Display bot info",
+    description: "Get information about bot information.",
+    visibility: true,
     execute(message, prefix, bot) {
 
         let countUsers = 0;

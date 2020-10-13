@@ -3,6 +3,7 @@ const database = require("../DataAccessObjects/ServersImplementation.js");
 module.exports = {
     name: "add-welcome",
     description: "<tag> welcome <channel id>",
+    visibility: false,
     execute(message, channelId, bot){
         if (!message.member.hasPermission("ADMINISTRATOR")) {
             message.channel.send("You are not administrator");

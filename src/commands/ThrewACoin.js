@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: "flip",
+    description: "Flip a coin to get an eagle or a tailpiece.",
+    visibility: true,
     execute(message){
         const s = Math.random() * 100>50 ?  `Heads    🟡` :  `Tails    🟡`;
         const embed = new Discord.MessageEmbed()

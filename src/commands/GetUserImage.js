@@ -2,7 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: "avatar",
-    description: "menu list",
+    description: "Get an image of one or more users who were mentioned when calling the method.",
+    visibility: true,
     execute(message){
         if (!message.mentions.users.size){
             message.channel.send(message.author.avatarURL());

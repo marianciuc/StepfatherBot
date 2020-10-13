@@ -3,6 +3,8 @@ const log = require(`../Debug`);
 
 module.exports = {
     name: "bug",
+    description: "Send your report about the bug to us in a discord and telegram.",
+    visibility: true,
     execute(message, prefix, bot){
         let url;
         let content = " "; //Text collection

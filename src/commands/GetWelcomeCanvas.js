@@ -19,6 +19,8 @@ registerFont('./src/OtherRes/fonts/19572.ttf', {family: 'Lemon'});
 
 module.exports = {
     name: 'welcome',
+    description: "Call the bot help menu.",
+    visibility: false,
 
     /**
      * @param message

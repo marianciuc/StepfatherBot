@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: "yn",
+    description: "Get an answer to the question",
+    visibility: true,
     execute(message, prefix){
         const args = message.content.toLowerCase().slice(prefix.length).split(/ +/); //Getting args from string
         const s = Math.random() * 100>50 ? `No` : `Yes`;
