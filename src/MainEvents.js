@@ -147,7 +147,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
                 }
             }
         }
-    }, 1000);
+    }, 60000);
     /**
      * Bot added to the server event
      */
