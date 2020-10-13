@@ -53,8 +53,7 @@ module.exports = (bot, Discord, database, Guild, commandFiles) => {
 
                     const Server = await database.QueryInit(bot, channel.guild.id);
 
-                    if (Server !== null && Server.private_channel_id != null && Server.private_category_id != null && channel.parent.id && Server.private_category_id == channel.parent.id) {
-
+                    if (Server !== null && Server.private_channel_id != null && Server.private_category_id != null && channel.parent.id.available && Server.private_category_id == channel.parent.id) {
                         if (channel.id != Server.private_channel_id) {
                             let count = 0;
                             channel.members.map(member => {
