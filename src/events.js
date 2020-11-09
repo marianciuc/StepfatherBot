@@ -95,7 +95,6 @@ module.exports = (Discord, commandFiles) => {
         } else if (message.author.bot) return;
 
         GuildModel.findOne({guildId: message.guild.id}, (err, guild) => {
-            console.log('s')
             if (err) return debug.log(JSON.stringify(err), __filename);
             if (!guild && message.content.startsWith('!')) {
                 bot.commands.get('configure').execute(message, bot);

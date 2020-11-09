@@ -47,7 +47,7 @@ class Closeness {
                         if (err) return debug.log(err, __filename);
                     });
                 }).catch(err => debug.log(err, __filename));
-            });
+            }).catch(err => debug.log(err, __filename));
         });
     }
 }
