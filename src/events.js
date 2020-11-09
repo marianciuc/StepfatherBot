@@ -53,7 +53,7 @@ module.exports = (Discord, commandFiles) => {
                 if (!channel.deleted && channel.type === "voice") {
                     ClosenessModel.findOne({guildId: channel.guild.id}, (err, closeness) => {
                         if (err) return debug.log(err, __filename);
-                        if (!!closeness && !channel.parent.deleted && closeness.channel.parent.id === channel.parent.id && channel.id !== closeness.channel.room.id) {
+                        if (!!closeness && !!channel.parent && closeness.channel.parent.id === channel.parent.id && channel.id !== closeness.channel.room.id) {
                             if (channel.members.size < 1) {
                                 channel.delete("All users have left the voice channel.").catch(err => debug.log(err.message, __filename));
                             } else {
@@ -95,7 +95,6 @@ module.exports = (Discord, commandFiles) => {
         } else if (message.author.bot) return;
 
         GuildModel.findOne({guildId: message.guild.id}, (err, guild) => {
-            console.log('s')
             if (err) return debug.log(JSON.stringify(err), __filename);
             if (!guild && message.content.startsWith('!')) {
                 bot.commands.get('configure').execute(message, bot);

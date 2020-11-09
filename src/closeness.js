@@ -6,7 +6,7 @@ module.exports = () => {
         if (!oldState.channel || newState && newState.channel) {
             ClosenessModel.findOne({guildId: newState.channel.guild.id}, (err, closeness) => {
                 if (err) return debug.log(err, __filename);
-                if (!!closeness && closeness.guildId && newState.channel.parent.id && closeness.channel.parent.id == newState.channel.parent.id) {
+                if (!!closeness && !!closeness.guildId && newState.channel.parent.id && closeness.channel.parent.id == newState.channel.parent.id) {
                     if (closeness.channel.room.id === newState.channel.id) {
                         newState.channel.clone({
                             name: newState.member.user.username + " 🔓",
