@@ -53,7 +53,7 @@ module.exports = (Discord, commandFiles) => {
                 if (!channel.deleted && channel.type === "voice") {
                     ClosenessModel.findOne({guildId: channel.guild.id}, (err, closeness) => {
                         if (err) return debug.log(err, __filename);
-                        if (!!closeness && !channel.parent.deleted && closeness.channel.parent.id === channel.parent.id && channel.id !== closeness.channel.room.id) {
+                        if (!!closeness && !!channel.parent && closeness.channel.parent.id === channel.parent.id && channel.id !== closeness.channel.room.id) {
                             if (channel.members.size < 1) {
                                 channel.delete("All users have left the voice channel.").catch(err => debug.log(err.message, __filename));
                             } else {
