@@ -1,5 +1,5 @@
 const ClosenessModel = require('./entity/closeness');
-const debug = require('./telegram').prototype
+const debug = require('./telegram')
 
 module.exports = () => {
     bot.on("voiceStateUpdate", async (oldState, newState) => {
