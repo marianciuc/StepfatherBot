@@ -2,7 +2,7 @@ const {connect, connection, set} = require('mongoose');
 const debug = require('../telegram')
 
 
-connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@stepfatherbot.jgdli.mongodb.net/Stepfather?retryWrites=true&w=majority`, {
+connect(`mongodb+srv://steproot:Vovik1596@stepfatherbot.jgdli.mongodb.net/Stepfather?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
