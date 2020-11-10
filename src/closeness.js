@@ -2,7 +2,7 @@ const ClosenessModel = require('./entity/closeness');
 const debug = require('./telegram')
 
 module.exports = () => {
-    bot.on("voiceStateUpdate", async (oldState, newState) => {
+    bot.on("voiceStateUpdate",  (oldState, newState) => {
         if (!oldState.channel || newState && newState.channel) {
             ClosenessModel.findOne({guildId: newState.channel.guild.id}, (err, closeness) => {
                 if (err) return debug.log(err, __filename);
