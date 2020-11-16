@@ -69,3 +69,11 @@ Some basic bot commands are:
   </tr>
 </table>
 </div>
+
+## ✨ Installation
+To install, enter the following commands into the terminal
+```bash
+git clone https://github.com/Hesowam/StepfatherBot.git
+cd StepfatherBot
+pm2 start pm2-config.json
+```
