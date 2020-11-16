@@ -6,13 +6,13 @@ const commandFiles  = fs.readdirSync('./src/commands').filter(file => file.endsW
 
 global.bot = bot;
 
-require("./src/events")(Discord, commandFiles);
-require("./src/closeness")(bot);
-require("./src/properties/mongodb");
+require(__dirname + "/src/events")(Discord, commandFiles);
+require(__dirname + "/src/closeness")(bot);
+require(__dirname + "/src/config/mongodb");
+require(__dirname + "/src/status");
 
 
 /**
- TODO fix some bugs [ empty id`s in database, - ]
  TODO realise welcome role system
  TODO realise webPage with admin panel
  **/

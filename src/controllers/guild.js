@@ -1,29 +1,33 @@
-const Model         = require('../entity/guild')
-const closeness     = require('../controllers/closeness')
-const debug         = require('../telegram')
-const welcome       = require('../controllers/welcome')
+const { guildEntity } = require( '../entity/index' )
+const { closenessController, welcomeController } = require( '../controllers/index' )
+const debug = require( '../telegram' )
 
-class Guild {
-    create(guild) {
-        closeness.create(guild).then(() => {
-            welcome.create(guild).then(() => {
-                const model = {
-                    guildId: guild.id,
-                    name: guild.name,
-                    members: {
-                        count: guild.memberCount || guild.members.cache.size,
-                    },
-                    closeness: guild.id,
-                    roles: guild.roles.cache.size,
-                    iconURL: guild.iconURL({format: "png"}),
-                    updated: Date.now()
-                };
-                Model.findOneAndUpdate({guildId: guild.id}, model, {upsert:true}, function(err, doc){
-                    if (err) return debug.log(err, __filename);
-                });
-            });
-        })
-    }
+const remove = ( guildObject ) => {
+    guildEntity.findOneAndUpdate( { guildId: guildObject.id }, { status: 'DELETED' }, { upsert: true }, function ( err, doc ) {
+        if ( err ) return debug.log( err, __filename );
+    } );
+    return 0;
 }
 
-module.exports = Guild.prototype;
+const create = ( guildObject ) => {
+    closenessController.create( guildObject ).then( () => {
+        welcomeController.create( guildObject ).then( () => {
+            const model = {
+                guildId: guildObject.id,
+                name: guildObject.name,
+                members: {
+                    count: guildObject.memberCount || guildObject.members.cache.size,
+                },
+                roles: guildObject.roles.cache.size,
+                iconURL: guildObject.iconURL( { format: "png" } ),
+                updated: Date.now()
+            };
+            guildEntity.findOneAndUpdate( { guildId: guildObject.id }, model, { upsert: true }, function ( err, doc ) {
+                if ( err ) return debug.log( err, __filename );
+            } );
+        } );
+    } );
+    return 0;
+}
+
+module.exports = { create, remove };

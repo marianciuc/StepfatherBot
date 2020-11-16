@@ -1,4 +1,4 @@
-const News      = require('../entity/news')
+const { news }  = require('../entity/index')
 const Discord   = require('discord.js');
 
 module.exports = {
@@ -6,7 +6,7 @@ module.exports = {
     description: "🆕 Call up a menu with the latest news about the bot update.",
     visibility: true,
     execute(message){
-        News.findOne({}, {}, { sort: { 'created_at' : -1 } }, function(err, post) {
+        news.findOne({}, {}, { sort: { 'created_at' : -1 } }, function(err, post) {
             bot.users.fetch('295862909714825217').then((user) => {
                 const embed = new Discord.MessageEmbed()
                     .setColor("0xffd63e")
