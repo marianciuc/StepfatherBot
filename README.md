@@ -77,3 +77,19 @@ git clone https://github.com/Hesowam/StepfatherBot.git
 cd StepfatherBot
 pm2 start pm2-config.json
 ```
+The path to the configuration file:  `StepfatherBot/src/properties/app.js`. 
+You need to mark here the key to the bot's telegrams, the channel to which important messages need to be sent, the bot's discord key and the login with the password to the database.
+```javascript
+port: env.port || 5000,
+    mongodb: {
+        username: env.mongodb_username
+        password: env.mongodb_password
+        database: 'stepfatherbot'
+    },
+    telegram: {
+        token: env.telegram_token
+    },
+    discord: {
+        token: env.discord_token
+    }
+```
