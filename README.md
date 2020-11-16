@@ -75,6 +75,7 @@ To install, enter the following commands into the terminal
 ```bash
 git clone https://github.com/Hesowam/StepfatherBot.git
 cd StepfatherBot
+npm install
 pm2 start pm2-config.json
 ```
 The path to the configuration file:  `StepfatherBot/src/properties/app.js`. 
