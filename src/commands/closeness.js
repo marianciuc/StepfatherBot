@@ -1,4 +1,4 @@
-const Model = require('../entity/closeness')
+const {closenessEntity} = require('../entity/index')
 
 module.exports = {
     name: "private",
@@ -9,7 +9,7 @@ module.exports = {
             message.channel.send("Sorry, but you are not an administrator of this guild, so you can't create private rooms.");
             return 0;
         }
-        Model.findOne({guildId: message.guild.id}, (err, closeness) => {
+        closenessEntity.findOne({guildId: message.guild.id}, (err, closeness) => {
             if (err) debug.log(err, __filename)
             if (!!closeness){
                 bot.channels.fetch(closeness.channel.parent.id).then((channel) => {
@@ -49,7 +49,7 @@ module.exports = {
                         },
                         updated: Date.now()
                     };
-                    Model.findOneAndUpdate({guildId: message.guild.id}, model, {upsert:true}, function(err, doc){
+                    closenessEntity.findOneAndUpdate({guildId: message.guild.id}, model, {upsert:true}, function(err, doc){
                         if (err) return debug.log(err, __filename);
                     });
                 }).catch(err => debug.log(err, __filename));
