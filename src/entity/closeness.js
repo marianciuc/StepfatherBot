@@ -15,4 +15,4 @@ const ClosenessSchema = new Schema({
     }
 });
 
-module.exports = model('Closeness', ClosenessSchema);
+module.exports = model('closeness', ClosenessSchema);

@@ -1,4 +1,4 @@
-const {closenessEntity} = require('../entity/index')
+const closenessEntity = require('../entity/closeness')
 
 module.exports = {
     name: "private",

@@ -1,10 +1,10 @@
-const { closeness } = require( './entity/index' );
+const { closenessEntity } = require( './entity/index' );
 const debug = require( './telegram' )
 
 module.exports = () => {
     bot.on( "voiceStateUpdate", ( oldState, newState ) => {
         if ( !oldState.channel || newState && newState.channel ) {
-            closeness.findOne( { guildId: newState.channel.guild.id }, ( err, closeness ) => {
+            closenessEntity.findOne( { guildId: newState.channel.guild.id }, ( err, closeness ) => {
                 if ( err ) return debug.log( err, __filename );
                 if ( !!closeness && !!closeness.guildId && newState.channel && newState.channel.parent && newState.channel.parent.id && closeness.channel.parent.id == newState.channel.parent.id ) {
                     if ( closeness.channel.room.id === newState.channel.id ) {
