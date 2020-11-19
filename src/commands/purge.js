@@ -10,7 +10,7 @@ module.exports = {
         if (isNaN(amount) || !amount || amount < 2 || amount > 99) {
             return msg.reply(`❌ Please provide a number between 2 and 100 for the number of messages to delete.`);
         }
-        if (!msg.member.hasPermission("ADMINISTRATOR") || msg.member.id !== "295862909714825217") {
+        if (!msg.member.hasPermission("ADMINISTRATOR")) {
             msg.channel.send("❌ Sorry, but you are not an administrator of this guild.");
             return 0;
         }

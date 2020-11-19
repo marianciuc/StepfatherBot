@@ -1,8 +1,9 @@
-const {connect, connection, set} = require('mongoose');
+const { connect, connection, set } = require('mongoose');
 const debug = require('../telegram')
+const { mongodb } = require('./app')
 
 
-connect(`mongodb+srv://steproot:Vovik1596@stepfatherbot.jgdli.mongodb.net/Stepfather?retryWrites=true&w=majority`, {
+connect(`mongodb+srv://${mongodb.username}:${mongodb.password}@${mongodb.database}.jgdli.mongodb.net/Stepfather?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

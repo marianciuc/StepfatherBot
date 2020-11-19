@@ -6,7 +6,7 @@ module.exports = {
     visibility: true,
     execute(message) {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            message.channel.send("Sorry, but you are not an administrator of this guild, so you can't change the prefix.");
+            message.channel.send("Sorry, but you are not an administrator of this guild, so you can't create private rooms.");
             return 0;
         }
         Model.findOne({guildId: message.guild.id}, (err, closeness) => {

@@ -7,19 +7,14 @@ const GuildSchema = new Schema({
     members: {
         count: {type: Number, min: 0},
     },
-    closeness: {
-        ref: 'closeness',
-        type: String,
-        default: null
-    },
-    welcome: {
-        ref: 'welcome',
-        type: String,
-        default: null
-    },
     roles: Number,
     iconURL: String,
-    prefix: {type: String, default: '!'}
+    prefix: {type: String, default: '!'},
+    status: {
+        type: String,
+        enum : ['NEW', 'DELETED'],
+        default: 'NEW'
+    },
 });
 
 module.exports = model('guild', GuildSchema);

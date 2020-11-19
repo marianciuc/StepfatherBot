@@ -1,4 +1,4 @@
-/logs/*
-config.json
 node_modules
 .env
+lsp
+.vscode
