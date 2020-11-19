@@ -37,7 +37,7 @@ const get = ( member, { type } ) => {
                     context.drawImage( image, 0, 0, width, height );
                     context.textAlign = 'center';
                     context.textBaseline = 'top';
-                    context.fillStyle = '#fff';
+                    context.fillStyle = '#ffffff';
                     loadImage( `${member.user.avatarURL( { format: "png" } )}` ).then( image => {
                         context.drawImage( image, 298, 17, 237, 237 );
                         context.font = '40pt Lemon';
