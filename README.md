@@ -4,7 +4,6 @@
     <h1>Stepfather bot</h1>
     <h4>A multipurpose Discord bot built with <a href="https://discord.js.org/#/" target="_blank">discord.js</a>.<br><br>
     <img src="https://www.codefactor.io/repository/github/hesowam/stepfatherbot/badge/master?s=bc6f6de950d55fc33d18c69b917a90a4ef72be86">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT">
     </h4>
 </div>
 
