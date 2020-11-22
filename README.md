@@ -79,7 +79,7 @@ sudo npm install
 npm install pm2@latest -g
 sudo pm2 start pm2-config.json
 ```
-
+If the repository is private
 ```bash
 sudo sudo git clone https://<LOGIN>:<PASSWORD>@github.com/Hesowam/StepfatherBot.git
 cd StepfatherBot
