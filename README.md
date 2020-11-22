@@ -75,7 +75,7 @@ To install, enter the following commands into the terminal
 ```bashsudo 
 git clone https://github.com/hesowam/StepfatherBott
 cd StepfatherBot
-sudo apt get isntall npm
+sudo apt-get install npm
 npm install pm2@latest -g
 sudo pm2 start pm2-config.json
 ```
@@ -83,7 +83,7 @@ If the repository is private
 ```bash
 sudo git clone https://<USERNAME>@github.com/hesowam/StepfatherBot
 cd StepfatherBot
-sudo apt get isntall npm
+sudo apt-get install npm
 npm install pm2@latest -g
 sudo pm2 start pm2-config.json
 ```
