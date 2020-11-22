@@ -73,7 +73,7 @@ Some basic bot commands are:
 ## ✨ Installation
 To install, enter the following commands into the terminal
 ```bash
-git clone https://github.com/Hesowam/StepfatherBot.git
+git clone https://github.com/Hesowam/StepfatherBot
 cd StepfatherBot
 npm install
 pm2 start pm2-config.json
