@@ -73,21 +73,21 @@ Some basic bot commands are:
 ## ✨ Installation
 To install, enter the following commands into the terminal
 ```bash
-sudo git clone https://github.com/hesowam/StepfatherBot
+git clone https://github.com/hesowam/StepfatherBot
 cd StepfatherBot
-sudo apt-get install npm
-sudo npm install pm2@latest -g
-sudo npm install
-sudo pm2 start pm2-config.json
+apt-get install npm
+npm install pm2@latest -g
+npm install
+pm2 start pm2-config.json
 ```
 If the repository is private
 ```bash
-sudo git clone https://<USERNAME>@github.com/hesowam/StepfatherBot
+git clone https://<USERNAME>@github.com/hesowam/StepfatherBot
 cd StepfatherBot
-sudo apt-get install npm
-sudo npm install pm2@latest -g
-sudo npm install
-sudo pm2 start pm2-config.json
+apt-get install npm
+npm install pm2@latest -g
+npm install
+pm2 start pm2-config.json
 ```
 The path to the configuration file:  `StepfatherBot/src/properties/app.js`. 
 You need to mark here the key to the bot's telegrams, the channel to which important messages need to be sent, the bot's discord key and the login with the password to the database.
