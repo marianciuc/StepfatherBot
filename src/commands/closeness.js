@@ -1,59 +1,51 @@
-const closenessEntity = require('../entity/closeness')
+const {Closeness} = require('../entity/index')
+const {ChannelType: {GuildCategory, GuildVoice}, SlashCommandBuilder, PermissionFlagsBits: {Administrator}} = require('discord.js')
 
 module.exports = {
-    name: "private",
-    description: "👨‍👧 Create a new private room (For administrators only)",
-    visibility: true,
-    execute(message) {
-        if (!message.member.hasPermission("ADMINISTRATOR")) {
-            message.channel.send("Sorry, but you are not an administrator of this guild, so you can't create private rooms.");
-            return 0;
-        }
-        closenessEntity.findOne({guildId: message.guild.id}, (err, closeness) => {
-            if (err) debug.log(err, __filename)
-            if (!!closeness){
-                bot.channels.fetch(closeness.channel.parent.id).then((channel) => {
-                    if (channel.deleted) return
-                    channel.delete()
-                });
-                bot.channels.fetch(closeness.channel.room.id).then((channel) => {
-                    if (channel.deleted) return
-                    channel.delete()
-                });
+    data: new SlashCommandBuilder()
+        .setName("configure")
+        .setDescription("‍👧 Create a new private room (For administrators only")
+        .setDefaultMemberPermissions(Administrator),
+    async execute(interaction) {
+        const query = { where: { guildId: interaction.guild.id }}
+        const closeness = await Closeness.findAll(query);
+
+        if (closeness.length !== 0) {
+            for (const doc of closeness) {
+                interaction.guild.channels.fetch(doc.dataValues.channelParentId).then(channel => {
+                    if (channel) channel.delete();
+                }).catch(err => console.error(err))
+                interaction.guild.channels.fetch(doc.dataValues.channelRoomId).then(channel => {
+                    if (channel) channel.delete();
+                }).catch(err => console.error(err))
             }
-        }).then(()=>{
-            message.guild.channels.create("💕 Stepfather bot", {
-                type: 'category',
-                reason: 'Needed a cool new channel'
-            }).then(channel => {
-                return message.guild.channels.create("🌺 Main", {
-                    type: 'voice',
-                    reason: 'Needed a cool new channel',
-                    parent: channel
-                }, (err) => {
-                    message.guild.owner.send('Error creating, bot not have permissions.').catch(err => {
-                        debug.log(JSON.stringify(err), __filename);
-                    });
-                }).then(voiceChannel => {
-                    const model = {
-                        guildId: message.guild.id,
-                        channel: {
-                            parent: {
-                                id: channel.id,
-                                name: channel.name,
-                            },
-                            room: {
-                                id: voiceChannel.id,
-                                name: voiceChannel.name,
-                            }
-                        },
-                        updated: Date.now()
-                    };
-                    closenessEntity.findOneAndUpdate({guildId: message.guild.id}, model, {upsert:true}, function(err, doc){
-                        if (err) return debug.log(err, __filename);
-                    });
-                }).catch(err => debug.log(err, __filename));
-            });
-        })
+            await Closeness.destroy(query);
+        }
+        createCloseness(interaction);
     }
+}
+
+function createCloseness(interaction) {
+    interaction.guild.channels.create({
+        name: `💕 ${bot.user.username}`,
+        type: GuildCategory,
+        reason: 'Creating a category for private channels'
+    }).then(category => {
+        return interaction.guild.channels.create({
+            name: "🌺 Main",
+            type: GuildVoice,
+            reason: 'Creating a voice channel for private channels',
+            parent: category
+        }).then(async voice => {
+            await Closeness.create({
+                guildId: interaction.guild.id,
+                channelParentId: category.id,
+                channelRoomId: voice.id
+            })
+            interaction.reply({content: "Configuration of voice channels successfully completed", ephemeral: true});
+        })
+    }).catch(function (err) {
+        console.error(err)
+        interaction.reply(`An error occurred in the configuration of the private channels, please check the access rights of the bot or email the developers ${process.env.MAIL}`);
+    })
 }

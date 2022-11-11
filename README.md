@@ -89,19 +89,17 @@ npm install pm2@latest -g
 npm install
 pm2 start pm2-config.json
 ```
-The path to the configuration file:  `StepfatherBot/src/properties/app.js`. 
+The path to the configuration file:  `StepfatherBot/.env`. 
 You need to mark here the key to the bot's telegrams, the channel to which important messages need to be sent, the bot's discord key and the login with the password to the database.
-```javascript
-port: env.port || 5000,
-    mongodb: {
-        username: env.mongodb_username
-        password: env.mongodb_password
-        database: 'stepfatherbot'
-    },
-    telegram: {
-        token: env.telegram_token
-    },
-    discord: {
-        token: env.discord_token
-    }
+
+Structure `.env`
+```dotenv
+DISCORD_TOKEN = ""
+DB_USERNAME = ""
+DB_PASSWORD = ""
+DB_NAME = ""
+DB_HOST = ""
+DB_DIALECT = ""
+TELEGRAM_TOKEN = ""
+DISCORD_ID = ""
 ```

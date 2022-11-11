@@ -1,18 +1,27 @@
-const {Schema, model} = require('mongoose');
+const { DataTypes } = require('sequelize');
 
-const ClosenessSchema = new Schema({
-    guildId: String,
-    updated: { type: Date, default: Date.now },
-    channel: {
-        parent: {
-            id: {type: String, default: undefined},
-            name: {type: String, default: undefined},
-        },
-        room: {
-            id: {type: String, default: undefined},
-            name: {type: String, default: undefined},
-        }
+const Closeness = sequelize.define('closeness', {
+    uid: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    guildId: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    channelParentId: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    channelRoomId: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
+}, {freezeTableName: true})
+
+Closeness.sync({ alter: true }).then(()=> {
+    console.log(`Entity ${Closeness.name} successfully synchronized`);
 });
 
-module.exports = model('closeness', ClosenessSchema);
+module.exports = Closeness

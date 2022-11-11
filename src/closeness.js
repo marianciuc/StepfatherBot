@@ -1,54 +1,50 @@
-const { closenessEntity } = require( './entity/index' );
-const debug = require( './telegram' )
+const { Closeness } = require( './entity/index' );
+const { PermissionsBitField} = require("discord.js");
 
-module.exports = () => {
-    bot.on( "voiceStateUpdate", ( oldState, newState ) => {
-        if ( !oldState.channel || newState && newState.channel ) {
-            closenessEntity.findOne( { guildId: newState.channel.guild.id }, ( err, closeness ) => {
-                if ( err ) return debug.log( err, __filename );
-                if ( !!closeness && !!closeness.guildId && newState.channel && newState.channel.parent && newState.channel.parent.id && closeness.channel.parent.id == newState.channel.parent.id ) {
-                    if ( closeness.channel.room.id === newState.channel.id ) {
-                        newState.channel.clone( {
-                            name: newState.member.user.username + " 🔓",
-                            reason: 'Creation of a new private channel.',
-                            userLimit: 2
-                        } ).then( clone => {
-                            newState.setChannel( clone, "Moving a user to a private channel." ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                            clone.overwritePermissions( [
-                                {
-                                    id: newState.member.user.id,
-                                    allow: [ 'MANAGE_CHANNELS' ],
-                                },
-                            ], 'Create rights for channel management.' ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                            let interval = setInterval( () => {
-                                if ( clone.deleted ) {
-                                    clearInterval( interval );
-                                    return;
-                                }
-                                if ( clone.members.size < 1 ) {
-                                    clone.delete( "All users have left the voice channel." ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                                    clearInterval( interval );
-                                    return;
-                                }
-                                if ( !clone.full ) {
-                                    clone.setName( clone.name.replace( "🔐", "🔓" ) ).then( () => {
-                                        if ( !!clone.name.match( new RegExp( "🔓" ) ) === false ) {
-                                            clone.setName( clone.name + ' 🔓' ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                                        }
-                                    } ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                                } else if ( clone.full ) {
-                                    clone.setName( clone.name.replace( "🔓", "🔐" ) ).then( () => {
-                                        if ( !!clone.name.match( new RegExp( "🔐" ) ) === false ) {
-                                            clone.setName( clone.name + ' 🔐' ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                                        }
-                                    } ).catch( err => debug.log( JSON.stringify( err ), __filename ) );
-                                }
-                            }, 5000 );
-                        } )
-                    }
-                }
-            } );
-
+function updateStatsVoiceChannel(channel) {
+    const interval = setInterval(() => {
+        if (channel.deleted) {
+            clearInterval(channel);
+            return;
         }
-    } );
+        if (channel.members.size < 1) {
+            channel.delete("All users have left the voice channel.").catch(err => console.log(JSON.stringify(err), __filename));
+            clearInterval(interval);
+            return;
+        }
+        if (!channel.full) {
+            channel.setName(channel.name.replace("🔐", "🔓")).then(() => {
+                if (!!channel.name.match(new RegExp("🔓")) === false) {
+                    channel.setName(channel.name + ' 🔓').catch(err => console.log(JSON.stringify(err), __filename));
+                }
+            }).catch(err => console.log(JSON.stringify(err), __filename));
+        } else if (channel.full) {
+            channel.setName(channel.name.replace("🔓", "🔐")).then(() => {
+                if (!!channel.name.match(new RegExp("🔐")) === false) {
+                    channel.setName(channel.name + ' 🔐').catch(err => console.log(JSON.stringify(err), __filename));
+                }
+            }).catch(err => console.log(JSON.stringify(err), __filename));
+        }
+    }, 5000);
 }
+async function closenessStart(newState) {
+    const closeness = await Closeness.findOne({where: {guildId: newState.channel.guild.id}});
+
+    if (!!closeness && closeness.dataValues.channelParentId === newState.channel.parent.id && closeness.channelRoomId === newState.channel.id) {
+            newState.channel.clone({
+                name: newState.member.user.username + " 🔓",
+                reason: `Creation of a new private channel for ${newState.member.user.username}.`,
+                userLimit: 2
+            }).then(clone => {
+                newState.setChannel(clone, "Moving a user to a private channel.").catch(err => console.log(JSON.stringify(err), __filename));
+                clone.permissionOverwrites.set([
+                    {
+                        id: newState.member.user.id,
+                        deny: [PermissionsBitField.Flags.ManageChannels],
+                    },
+                ], `Authorisation granted to a user ${newState.member.user.id} to control the voice channel.`).catch(err => console.log(JSON.stringify(err), __filename));
+                updateStatsVoiceChannel(clone)
+            });
+        }
+}
+module.exports = {closenessStart, updateStatsVoiceChannel}
